@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    {{template "header" .}}
+
+<body>
+
+    <header id="home">
+        <div class="bg-img" style="background-image: url('./static/img/background3.jpg');">
+            <div class="overlay"></div>
+        </div>
+        
+        <nav id="nav" class="navbar nav-transparent">
+            <div class="container">
+                <div class="navbar-header">
+                    <div class="navbar-brand">
+                        <a href="/">
+                            <img class="logo" src="./static/img/logo.png" alt="logo">
+                            <img class="logo-alt" src="./static/img/logo-alt.png" alt="logo">
+                        </a>
+                    </div>
+                    <div class="nav-collapse">
+                        <span></span>
+                    </div>
+                </div>
+                
+                {{template "main_menu" .}}
+
+            </div>
+        </nav>
+        
+        <div class="home-wrapper">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1">
+                        <div class="home-content">
+                            <h1 class="white-text">Besplatna Taxi Aplikacija</h1>
+                            <p class="white-text" style="margin-bottom: 30px;">
+                                AnonTaxi radimo jer je plaćanje ogromnih naknada multinacionalnim kompanijama za jednostavnu aplikaciju u <br>
+                                najmanju ruku suludo. Pokrenimo stoga prvu samoodrživu besplatnu aplikaciju otvorenog koda u povijesti!
+                            </p>
+                            <a href="/faq" class="white-btn"><i class="fa fa-info"></i> Pročitaj više</a>
+                            <a href="/ukljuci-se" class="main-btn" target="_blank"><i class="fa fa-globe"></i> Uključi se!</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+	<div id="about" class="section md-padding">
+		<div class="container">
+			<div class="row">				
+				<div class="section-header text-center">
+					<h2 class="title">Što ćemo uraditi?</h2>
+				</div>
+				
+				<div class="col-md-4">
+					<div class="about">
+						<i class="fa fa-database"></i>
+						<h3>Izdavanje tokena-dionice</h3>
+                        <p>Token-dionica će onome tko ga kupi omogućiti glasanje o projektu u zatvorenoj Telegram grupi i isplatu ostvarenog profita prema broju tokena.</p>
+						<a href="/faq">Pročitaj više</a>
+					</div>
+				</div>
+				
+				<div class="col-md-4">
+					<div class="about">
+						<i class="fa fa-wrench"></i>
+						<h3>Izrada i održavanje aplikacije</h3>
+						<p>Programerski tim odmah kreće u izradu aplikacije prema nalozima vlasnika tokena-dionica, a na isti način vrši se i održavanje same aplikacije.</p>
+						<a href="/faq">Pročitaj više</a>
+					</div>
+				</div>
+
+				<div class="col-md-4">
+					<div class="about">
+						<i class="fa fa-line-chart"></i>
+						<h3>Totalna dominacija</h3>
+						<p>Aplikacijom prilagođenom vozačima i korisnicima (a ne profitu multinacionalne kompanije) te ukidanjem naknade uspostavljamo dominaciju na tržištu.</p>
+						<a href="/faq">Pročitaj više</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div id="numbers" class="section sm-padding">
+		<div class="bg-img" style="background-image: url('./static/img/background1.jpg');">
+			<div class="overlay"></div>
+		</div>
+		<div class="container">
+			<div class="row">
+                <div class="col-md-10 col-md-offset-1 text-center">
+                    <div class="home-content">
+                        <h2 class="white-text">Pridruži nam se odmah!</h2>
+                        <p class="white-text" style="margin-bottom: 30px;">
+                            Ukoliko ne želiš plaćati skupe naknade za jednostavnu aplikaciju, priključi nam se što prije!
+                        </p>
+                        <a href="/ukljuci-se" class="main-btn"><i class="fa fa-check"></i> Da, uključujem se!</a>
+                    </div>
+                </div>
+			</div>
+		</div>
+	</div>
+
+	<div id="features" class="section md-padding bg-grey">
+		<div class="container">			
+			<div class="row">
+
+				<div class="col-md-6">
+					<div class="section-header">
+						<h2 class="title">Prednosti ovakve aplikacije</h2>
+					</div>
+                    <p>Prednosti aplikacije koju osniva, izgrađuje i kojom upravlja zajednica koja ju i koristi su više nego očite:</p>
+                    <div class="feature">
+						<i class="fa fa-check"></i>
+						<p>Izbacivanje naknada</p>
+					</div>
+                    <div class="feature">
+						<i class="fa fa-check"></i>
+						<p>Mogućnost odlučivanja u projektu</p>
+					</div>
+					<div class="feature">
+						<i class="fa fa-check"></i>
+						<p>Mogućnost zarade od projekta i aplikacije</p>
+					</div>
+                    <div class="feature">
+						<i class="fa fa-check"></i>
+						<p>Užitak izbacivanja multinacionalnih korporacija s hrvatskog tržišta tržišnim metodama (njihovim oruđem) kroz udruživanje</p>
+					</div>
+				</div>
+				
+				<div class="col-md-6">
+					<div id="about-slider1" class="owl-carousel owl-theme">
+						<img class="img-responsive" src="./static/img/uber-mrs.jpg" alt="">
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+    
+    {{template "footer" .}}
+
+</body>
+
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    {{template "header" .}}
+
+<body>
+
+    <header>
+        <nav id="nav" class="navbar">
+            <div class="container">
+                <div class="navbar-header">
+                    <div class="navbar-brand">
+                        <a href="/">
+                            <img class="logo" src="./static/img/logo.png" alt="logo">
+                            <img class="logo-alt" src="./static/img/logo-alt.png" alt="logo">
+                        </a>
+                    </div>
+                    <div class="nav-collapse">
+                        <span></span>
+                    </div>
+                </div>
+
+                {{template "main_menu" .}}
+
+            </div>
+        </nav>
+
+        <div class="header-wrapper sm-padding bg-dark">
+            <div class="container">
+                <h2>Česta pitanja</h2>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Naslovnica</a></li>
+                    <li class="breadcrumb-item active">FAQ</li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <div class="section md-padding">
+        <div class="container">
+            <div class="row">
+                <main id="main" class="col-md-9">
+
+                    {{ yield }}
+
+                </main>
+
+                <aside id="aside" class="col-md-3 hidden-sm-down">
+                    <div class="widget">
+                        <h3 class="title">Menu</h3>
+                        <div class="widget-category">
+                            <a href="/">Naslovnica</a>
+                            <a href="/faq">Česta pitanja</a>
+                            <a href="/ukljuci-se" style="color: #E42D20;"><strong>Uključi se odmah!</strong></a>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </div>
+
+    {{template "footer" .}}
+
+</body>
+
+</html>
