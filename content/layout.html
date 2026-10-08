@@ -3,61 +3,56 @@
 
     {{template "header" .}}
 
-<body>
+<body class="starter-page-page">
 
-    <header>
-        <nav id="nav" class="navbar">
-            <div class="container">
-                <div class="navbar-header">
-                    <div class="navbar-brand">
-                        <a href="/">
-                            <img class="logo" src="./static/img/logo.png" alt="logo">
-                            <img class="logo-alt" src="./static/img/logo-alt.png" alt="logo">
-                        </a>
-                    </div>
-                    <div class="nav-collapse">
-                        <span></span>
-                    </div>
-                </div>
+  <header id="header" class="header d-flex align-items-center sticky-top">
+    <div class="container-fluid position-relative d-flex align-items-center justify-content-between">
 
-                {{template "main_menu" .}}
+      <a href="/" class="logo d-flex align-items-center me-auto me-xl-0">
+        <!-- Uncomment the line below if you also wish to use an image logo -->
+        <img src="assets/img/logo.png" alt="Aint City">
+        <!-- <h1 class="sitename">Append</h1><span>.</span> -->
+      </a>
 
-            </div>
-        </nav>
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/about" class="active">About</a></li>
+          <li><a href="/pricing">Pricing</a></li>
+        </ul>
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
 
-        <div class="header-wrapper sm-padding bg-dark">
-            <div class="container">
-                <h2>Česta pitanja</h2>
-                <ul class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/">Naslovnica</a></li>
-                    <li class="breadcrumb-item active">FAQ</li>
-                </ul>
-            </div>
-        </div>
-    </header>
+      <a class="btn-getstarted" href="/">Webmasters</a>
 
-    <div class="section md-padding">
-        <div class="container">
-            <div class="row">
-                <main id="main" class="col-md-9">
-
-                    {{ yield }}
-
-                </main>
-
-                <aside id="aside" class="col-md-3 hidden-sm-down">
-                    <div class="widget">
-                        <h3 class="title">Menu</h3>
-                        <div class="widget-category">
-                            <a href="/">Naslovnica</a>
-                            <a href="/faq">Česta pitanja</a>
-                            <a href="/ukljuci-se" style="color: #E42D20;"><strong>Uključi se odmah!</strong></a>
-                        </div>
-                    </div>
-                </aside>
-            </div>
-        </div>
     </div>
+  </header>
+
+  <main class="main">
+
+    <!-- Page Title -->
+    <div class="page-title" data-aos="fade">
+      <div class="heading">
+        <div class="container">
+          <div class="row d-flex justify-content-center text-center">
+            <div class="col-lg-8">
+              <h1>About Doolox</h1>
+              <p class="mb-0">Uber For Websites</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <nav class="breadcrumbs">
+        <div class="container">
+          <ol>
+            <li><a href="/">Home</a></li>
+            <li class="current">About</li>
+          </ol>
+        </div>
+      </nav>
+    </div><!-- End Page Title -->
+
+    {{ yield }}
 
     {{template "footer" .}}
 
