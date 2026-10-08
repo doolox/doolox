@@ -1,9 +1,9 @@
 {{define "main_menu"}}
       <nav id="navmenu" class="navmenu">
         <ul>
-          <li><a href="/">Home</a></li>
-          <li><a href="/about">About</a></li>
-          <li><a href="/pricing">Pricing</a></li>
+          <li><a href="/"{{if .Page.IsActive "/"}} class="active"{{end}}>Home</a></li>
+          <li><a href="/about"{{if .Page.IsActive "/about"}} class="active"{{end}}>About</a></li>
+          <li><a href="/pricing"{{if .Page.IsActive "/pricing"}} class="active"{{end}}>Pricing</a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
