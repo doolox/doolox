@@ -24,7 +24,7 @@ func pageView(ctx *macaron.Context) {
 	ctx.HTML(
 		200,
 		page,
-		nil,
+		ctx.Data,
 		macaron.HTMLOptions{Layout: layout})
 }
 
