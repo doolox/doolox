@@ -1,51 +1,79 @@
 {{define "footer"}}
-<footer id="footer" class="sm-padding bg-dark">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="footer-logo">
-                    <a href="/"><img src="./static/img/logo-alt.png" alt="logo"></a>
-                </div>
-                <ul class="footer-follow">
-                    <li><a href="https://t.me/anonutopia" target="_blank"><i class="fa fa-telegram"></i></a></li>
-                    <li><a href="https://www.facebook.com/AnonTaxi" target="_blank"><i class="fa fa-facebook"></i></a></li>
-                    <li><a href="https://github.com/anonutopia/anonutopians/blob/master/anontaxi.md" target="_blank"><i class="fa fa-github"></i></a></li>
-                </ul>
-                <div class="footer-copyright">
-                    <p>Copyright &copy; 2020 <a href="/">AnonTaxi</a>.</p>
-                </div>
-            </div>
+<footer id="footer" class="footer position-relative light-background">
+
+    <div class="container footer-top">
+      <div class="row gy-4">
+        <div class="col-lg-5 col-md-12 footer-about">
+          <a href="/" class="logo d-flex align-items-center">
+            <img src="assets/img/logo-white.png?v=4" alt="Doolox">
+          </a>
+          <p>Website building and maintenance through a monthly subscription - you get design, hosting, updates, support and everything you need. Simple, reliable and without hidden costs.</p>
+          <div class="social-links d-flex mt-4">
+            <a href="https://github.com/doolox"><i class="bi bi-github"></i></a>
+          </div>
         </div>
+
+        <div class="col-lg-2 col-6 footer-links">
+          <h4>Main Menu</h4>
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About Us</a></li>
+            <li><a href="/pricing">Pricing</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-2 col-6 footer-links">
+          <h4>Our Services</h4>
+          <ul>
+            <li><a href="/">Web Design</a></li>
+            <li><a href="/">Web Development</a></li>
+            <li><a href="/">Product Management</a></li>
+            <li><a href="/">Marketing</a></li>
+            <li><a href="/">Graphic Design</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-3 col-md-12 footer-contact text-center text-md-start">
+          <h4>Contact Us</h4>
+          <p>A108 Adam Street</p>
+          <p>New York, NY 535022</p>
+          <p>United States</p>
+          <p class="mt-4"><strong>Phone:</strong> <span>+1 5589 55488 55</span></p>
+          <p><strong>Email:</strong> <span>info@example.com</span></p>
+        </div>
+
+      </div>
     </div>
-</footer>
 
-<div id="back-to-top"></div>
-
-<div id="preloader">
-    <div class="preloader">
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
+    <div class="container copyright text-center mt-4">
+      <p>© <span>Copyright</span> <strong class="sitename"><a href="https://doolox.com">Doolox</a>.</strong> <span>All Rights Reserved.</span></p>
+      <div class="credits">
+        <!-- All the links in the footer should remain intact. -->
+        <!-- You can delete the links only if you've purchased the pro version. -->
+        <!-- Licensing information: https://bootstrapmade.com/license/ -->
+        <!-- Purchase the pro version with working PHP/AJAX contact form: [buy-url] -->
+        Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+      </div>
     </div>
-</div>
 
-<script type="text/javascript" src="./static/js/jquery.min.js"></script>
-<script type="text/javascript" src="./static/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="./static/js/owl.carousel.min.js"></script>
-<script type="text/javascript" src="./static/js/jquery.magnific-popup.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
-<script src="./static/js/datamaps.world.min.js"></script>
-<script src="./static/js/js.cookie.min.js"></script>
-<script type="text/javascript" src="./static/js/main.js?v=1.0.18"></script>    
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-113507826-4"></script>
-<script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
+  </footer>
 
-    gtag('config', 'UA-113507826-4');
-</script>
+  <!-- Scroll Top -->
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Preloader -->
+  <div id="preloader"></div>
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+  <script src="assets/vendor/aos/aos.js"></script>
+  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+  <script src="assets/vendor/imagesloaded/imagesloaded.pkgd.min.js"></script>
+  <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+
+  <!-- Main JS File -->
+  <script src="assets/js/main.js?v=9"></script>
 {{end}}

@@ -28,9 +28,9 @@ func initMacaron() *macaron.Macaron {
 	}
 
 	s := macaron.Static(
-		"content/theme/static",
+		"content/theme/assets",
 		macaron.StaticOptions{
-			Prefix:      "static",
+			Prefix:      "assets",
 			SkipLogging: true,
 			IndexFile:   "index.html",
 			// Expires defines which user-defined function to use for producing a HTTP Expires Header. Default is nil.
