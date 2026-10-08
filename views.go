@@ -19,8 +19,6 @@ func pageView(ctx *macaron.Context) {
 	db.FirstOrCreate(p, p)
 	ctx.Data["Page"] = p
 
-	log.Println(prettyPrint(p))
-
 	ctx.HTML(
 		200,
 		page,
