@@ -1,135 +1,54 @@
 package cms
 
-// import (
-// 	"fmt"
-// 	"io"
-// 	"io/ioutil"
-// 	"os"
-// 	"path/filepath"
-// 	"strings"
+import (
+	"log"
+	"os"
+	"path/filepath"
+	"strings"
 
-// 	"github.com/gocolly/colly"
-// )
+	macaron "gopkg.in/macaron.v1"
+)
 
-// func crawl(url string) {
-// 	links := make(map[string]bool)
-// 	c := colly.NewCollector()
+// docsDir is the folder the static website is generated into.
+const docsDir = "docs"
 
-// 	c.OnHTML("a[href]", func(e *colly.HTMLElement) {
-// 		href := e.Attr("href")
-// 		if strings.HasPrefix(href, "/") {
-// 			links[href] = true
-// 			c.Visit(fmt.Sprintf("http://0.0.0.0:5000%s", href))
-// 		}
-// 	})
+// generate renders every page stored in the database to a static HTML file
+// inside docs and returns how many files were written.
+//
+// It does not crawl anything, the pages are read from the database. Files that
+// already exist are overridden, folders are never created or copied, only
+// plain HTML files are written.
+func generate(render macaron.Render) int {
+	pages := []*Page{}
+	db.Find(&pages)
 
-// 	c.Visit("http://0.0.0.0:5000")
+	generated := 0
 
-// 	for link := range links {
-// 		c := colly.NewCollector()
-// 		c.OnResponse(func(r *colly.Response) {
-// 			if link == "/" {
-// 				link = "index"
-// 			}
-// 			f, _ := os.Create(fmt.Sprintf("docs/%s.html", link))
-// 			// fmt.Println(string(r.Body))
-// 			f.Write(r.Body)
-// 			copyDir("content/theme/static", "docs/static")
-// 		})
-// 		c.Visit(fmt.Sprintf("http://0.0.0.0:5000%s", link))
-// 	}
-// }
+	for _, page := range pages {
+		if strings.Contains(page.URL, "/") {
+			log.Printf("[generate] %q skipped, only plain html files are generated", page.URL)
+			continue
+		}
 
-// func copyFile(src, dst string) (err error) {
-// 	in, err := os.Open(src)
-// 	if err != nil {
-// 		return
-// 	}
-// 	defer in.Close()
+		html, err := render.HTMLString(
+			page.URL,
+			map[string]interface{}{"Page": page},
+			macaron.HTMLOptions{Layout: layoutFor(page.URL)})
+		if err != nil {
+			log.Printf("[generate] error while rendering %q: %v", page.URL, err)
+			continue
+		}
 
-// 	out, err := os.Create(dst)
-// 	if err != nil {
-// 		return
-// 	}
-// 	defer func() {
-// 		if e := out.Close(); e != nil {
-// 			err = e
-// 		}
-// 	}()
+		path := filepath.Join(docsDir, page.URL+".html")
 
-// 	_, err = io.Copy(out, in)
-// 	if err != nil {
-// 		return
-// 	}
+		if err := os.WriteFile(path, []byte(html), 0644); err != nil {
+			log.Printf("[generate] error while writing %q: %v", path, err)
+			continue
+		}
 
-// 	err = out.Sync()
-// 	if err != nil {
-// 		return
-// 	}
+		log.Printf("[generate] wrote %q", path)
+		generated++
+	}
 
-// 	si, err := os.Stat(src)
-// 	if err != nil {
-// 		return
-// 	}
-// 	err = os.Chmod(dst, si.Mode())
-// 	if err != nil {
-// 		return
-// 	}
-
-// 	return
-// }
-
-// func copyDir(src string, dst string) (err error) {
-// 	src = filepath.Clean(src)
-// 	dst = filepath.Clean(dst)
-
-// 	si, err := os.Stat(src)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	if !si.IsDir() {
-// 		return fmt.Errorf("source is not a directory")
-// 	}
-
-// 	_, err = os.Stat(dst)
-// 	if err != nil && !os.IsNotExist(err) {
-// 		return
-// 	}
-// 	if err == nil {
-// 		return fmt.Errorf("destination already exists")
-// 	}
-
-// 	err = os.MkdirAll(dst, si.Mode())
-// 	if err != nil {
-// 		return
-// 	}
-
-// 	entries, err := ioutil.ReadDir(src)
-// 	if err != nil {
-// 		return
-// 	}
-
-// 	for _, entry := range entries {
-// 		srcPath := filepath.Join(src, entry.Name())
-// 		dstPath := filepath.Join(dst, entry.Name())
-
-// 		if entry.IsDir() {
-// 			err = copyDir(srcPath, dstPath)
-// 			if err != nil {
-// 				return
-// 			}
-// 		} else {
-// 			// Skip symlinks.
-// 			if entry.Mode()&os.ModeSymlink != 0 {
-// 				continue
-// 			}
-
-// 			err = copyFile(srcPath, dstPath)
-// 			if err != nil {
-// 				return
-// 			}
-// 		}
-// 	}
-
-// 	return
-// }
+	return generated
+}

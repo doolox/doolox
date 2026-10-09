@@ -1,18 +1,28 @@
 package cms
 
 import (
-	"log"
+	"fmt"
+	"net/http"
 
 	macaron "gopkg.in/macaron.v1"
 )
 
-func pageView(ctx *macaron.Context) {
-	var page string
-	layout := "layout"
+// indexPage is the url of the page served for "/".
+const indexPage = "index"
 
-	if page = ctx.Params(":page"); page == "" {
-		page = "index"
-		layout = "layout_home"
+// layoutFor returns the layout used to render the page with the given url.
+func layoutFor(url string) string {
+	if url == indexPage {
+		return "layout_home"
+	}
+
+	return "layout"
+}
+
+func pageView(ctx *macaron.Context) {
+	page := ctx.Params(":page")
+	if page == "" {
+		page = indexPage
 	}
 
 	p := &Page{URL: page}
@@ -23,10 +33,13 @@ func pageView(ctx *macaron.Context) {
 		200,
 		page,
 		ctx.Data,
-		macaron.HTMLOptions{Layout: layout})
+		macaron.HTMLOptions{Layout: layoutFor(page)})
 }
 
 func generateView(ctx *macaron.Context) {
-	log.Println("fdsafas")
-	// crawl("http://0.0.0.0:5000")
+	generated := generate(ctx.Render)
+
+	ctx.Render.PlainText(
+		http.StatusOK,
+		[]byte(fmt.Sprintf("generated %d pages\n", generated)))
 }
