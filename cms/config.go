@@ -10,6 +10,7 @@ import (
 type Config struct {
 	Debug bool   `json:"debug"`
 	Theme string `json:"theme"`
+	URL   string `json:"url"`
 }
 
 // Load method loads configuration file to Config struct
