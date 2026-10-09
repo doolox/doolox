@@ -18,6 +18,7 @@ type Page struct {
 	gorm.Model
 	URL         string `sql:"size:255;unique_index"`
 	Title       string `sql:"size:255"`
+	Subtitle    string `sql:"size:255"`
 	Description string `sql:"size:255"`
 	Type        string `sql:"size:255"`
 }
