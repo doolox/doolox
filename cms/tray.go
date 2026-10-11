@@ -6,6 +6,7 @@ import (
 	"image"
 	"image/png"
 	"log"
+	"os/exec"
 	"runtime"
 
 	"fyne.io/systray"
@@ -54,6 +55,12 @@ func runTray(icon TrayIcon, onShutdown func()) {
 		systray.SetTitle("Doolox")
 		systray.SetTooltip("Doolox is running")
 
+		systray.SetOnTapped(func() {
+			if err := openBrowser("http://localhost:5000"); err != nil {
+				log.Printf("open browser: %v", err)
+			}
+		})
+
 		quit := systray.AddMenuItem("Quit", "Quit Doolox")
 
 		go func() {
@@ -86,4 +93,20 @@ func renderSVGIcon(svg []byte) ([]byte, error) {
 	}
 
 	return pngBytes.Bytes(), nil
+}
+
+// openBrowser opens the given URL in the system's default web browser.
+func openBrowser(url string) error {
+	var cmd *exec.Cmd
+
+	switch runtime.GOOS {
+	case "windows":
+		cmd = exec.Command("rundll32", "url.dll,FileProtocolHandler", url)
+	case "darwin":
+		cmd = exec.Command("open", url)
+	default:
+		cmd = exec.Command("xdg-open", url)
+	}
+
+	return cmd.Start()
 }
