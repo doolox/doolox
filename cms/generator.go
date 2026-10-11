@@ -14,6 +14,13 @@ import (
 // docsDir is the folder the static website is generated into.
 const docsDir = "docs"
 
+// generateSite generates the static website from the pages in the database.
+// It is called from the system tray menu.
+func generateSite() {
+	generated := generate(newRenderer())
+	log.Printf("generated %d pages", generated)
+}
+
 // generate renders every page stored in the database to a static HTML file
 // inside docs and returns how many files were written. The sitemap of the
 // generated pages is written as well.

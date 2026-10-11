@@ -61,6 +61,14 @@ func runTray(icon TrayIcon, onShutdown func()) {
 			}
 		})
 
+		mGenerate := systray.AddMenuItem("Generate", "Generate the static site")
+
+		go func() {
+			for range mGenerate.ClickedCh {
+				generateSite()
+			}
+		}()
+
 		quit := systray.AddMenuItem("Quit", "Quit Doolox")
 
 		go func() {

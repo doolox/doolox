@@ -11,10 +11,14 @@ import (
 	_ "github.com/go-macaron/session/redis"
 )
 
+// renderOpts holds the template configuration shared by the HTTP middleware
+// and the system tray menu.
+var renderOpts macaron.RenderOptions
+
 func initMacaron() *macaron.Macaron {
 	m := macaron.Classic()
 
-	ro := macaron.RenderOptions{
+	renderOpts = macaron.RenderOptions{
 		Layout: "layout",
 		Funcs: []template.FuncMap{map[string]interface{}{
 			"obfuscate": func(args ...interface{}) template.HTML {
@@ -24,7 +28,8 @@ func initMacaron() *macaron.Macaron {
 
 			},
 		}},
-		Directory: "content",
+		Directory:  "content",
+		Extensions: []string{".tmpl", ".html"},
 	}
 
 	s := macaron.Static(
@@ -40,9 +45,22 @@ func initMacaron() *macaron.Macaron {
 			},
 		})
 
-	m.Use(macaron.Renderer(ro))
+	m.Use(macaron.Renderer(renderOpts))
 	m.Use(s)
 	m.Use(cache.Cacher())
 
 	return m
+}
+
+// newRenderer returns a macaron.Render that can render templates outside of an
+// HTTP request. It is used by the system tray menu to generate the site.
+func newRenderer() macaron.Render {
+	ts := macaron.NewTemplateSet()
+	ts.Set(macaron.DEFAULT_TPL_SET_NAME, &renderOpts)
+
+	return &macaron.TplRender{
+		TemplateSet:     ts,
+		Opt:             &renderOpts,
+		CompiledCharset: macaron.PrepareCharset(renderOpts.Charset),
+	}
 }
