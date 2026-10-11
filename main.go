@@ -6,6 +6,9 @@ import (
 	"doolox/cms"
 )
 
+//go:embed assets/trayicon.svg
+var trayIconSVG []byte
+
 //go:embed assets/trayicon.png
 var trayIconPNG []byte
 
@@ -14,6 +17,7 @@ var trayIconICO []byte
 
 func main() {
 	cms.Start(cms.TrayIcon{
+		SVG: trayIconSVG,
 		PNG: trayIconPNG,
 		ICO: trayIconICO,
 	})

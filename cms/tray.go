@@ -1,14 +1,23 @@
 package cms
 
 import (
+	"bytes"
+	"fmt"
+	"image"
+	"image/png"
+	"log"
 	"runtime"
 
 	"fyne.io/systray"
+	"github.com/srwiley/oksvg"
+	"github.com/srwiley/rasterx"
 )
 
 // TrayIcon holds the icon assets used for the system tray icon.
 type TrayIcon struct {
-	// PNG is used for the tray icon on macOS and Linux.
+	// SVG is rasterized for the tray icon on Linux.
+	SVG []byte
+	// PNG is used for the tray icon on macOS and other non-Windows platforms.
 	PNG []byte
 	// ICO is used for the tray icon on Windows.
 	ICO []byte
@@ -16,20 +25,32 @@ type TrayIcon struct {
 
 // bytes returns the icon bytes that are appropriate for the current
 // operating system.
-func (t TrayIcon) bytes() []byte {
-	if runtime.GOOS == "windows" {
-		return t.ICO
+func (t TrayIcon) bytes() ([]byte, error) {
+	switch runtime.GOOS {
+	case "windows":
+		return t.ICO, nil
+	case "linux":
+		data, err := renderSVGIcon(t.SVG)
+		if err != nil {
+			return nil, fmt.Errorf("render Linux tray icon: %w", err)
+		}
+		return data, nil
+	default:
+		return t.PNG, nil
 	}
-
-	return t.PNG
 }
 
 // runTray shows the Doolox tray icon and blocks until the tray is quit.
 // onShutdown is called after the tray icon has been removed so the rest of
 // the application can shut down cleanly.
 func runTray(icon TrayIcon, onShutdown func()) {
+	iconData, err := icon.bytes()
+	if err != nil {
+		log.Fatalf("prepare tray icon: %v", err)
+	}
+
 	systray.Run(func() {
-		systray.SetIcon(icon.bytes())
+		systray.SetIcon(iconData)
 		systray.SetTitle("Doolox")
 		systray.SetTooltip("Doolox is running")
 
@@ -44,4 +65,25 @@ func runTray(icon TrayIcon, onShutdown func()) {
 			onShutdown()
 		}
 	})
+}
+
+func renderSVGIcon(svg []byte) ([]byte, error) {
+	const size = 64
+
+	icon, err := oksvg.ReadIconStream(bytes.NewReader(svg), oksvg.StrictErrorMode)
+	if err != nil {
+		return nil, err
+	}
+
+	canvas := image.NewRGBA(image.Rect(0, 0, size, size))
+	icon.SetTarget(0, 0, size, size)
+	dasher := rasterx.NewDasher(size, size, rasterx.NewScannerGV(size, size, canvas, canvas.Bounds()))
+	icon.Draw(dasher, 1)
+
+	var pngBytes bytes.Buffer
+	if err := png.Encode(&pngBytes, canvas); err != nil {
+		return nil, err
+	}
+
+	return pngBytes.Bytes(), nil
 }
