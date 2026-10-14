@@ -24,7 +24,7 @@ make build          # -> bin/doolox
 Build the installer (requires `dpkg-deb` and a C compiler for cgo):
 
 ```sh
-make build-deb       # -> dist/doolox_1.0.0_amd64.deb
+make build-deb       # -> dist/doolox_<version>_amd64.deb
 # or
 ./build-deb.sh
 ```
@@ -32,7 +32,7 @@ make build-deb       # -> dist/doolox_1.0.0_amd64.deb
 Install it:
 
 ```sh
-sudo apt install ./dist/doolox_1.0.0_amd64.deb
+sudo apt install ./dist/doolox_*.deb
 ```
 
 This installs the binary to `/opt/doolox`, a launcher to `/usr/bin/doolox`,
@@ -80,7 +80,7 @@ Option C — Inno Setup installer (requires Inno Setup 6+):
 
 ```powershell
 .\build.ps1               # first build the Windows binary
-ISCC.exe installer.iss    # -> dist\doolox-setup-1.0.0.exe
+ISCC.exe installer.iss    # -> dist\doolox-setup-<version>.exe
 ```
 
 ## Cross-compilation (optional)
@@ -121,3 +121,6 @@ make help       # list all targets
 - The tray icon assets (`assets/trayicon.svg`, `assets/trayicon.png`,
   `assets/trayicon.ico`) are embedded into the binary at build time with
   `go:embed`, so no extra runtime files are needed.
+- The app version is configured in `version.iss` — the single source of truth
+  used by both the Inno Setup (`installer.iss`) and Debian (`build-deb.sh`)
+  packaging. Bump it there and rebuild.

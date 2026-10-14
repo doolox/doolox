@@ -6,7 +6,7 @@
 ;  Build the Windows binary FIRST (from PowerShell in the project root):
 ;      .\build.ps1
 ;  which produces bin\doolox-windows-amd64.exe. Then compile this script
-;  (ISCC.exe installer.iss) -> dist\doolox-setup-1.0.0.exe.
+;  (ISCC.exe installer.iss) -> dist\doolox-setup-<version>.exe.
 ;
 ;  Layout after install:
 ;      C:\Program Files\Doolox\
@@ -32,9 +32,11 @@
 ; ============================================================================
 
 #define MyAppName "Doolox"
-#define MyAppVersion "1.0.0"
 #define MyAppPublisher "Doolox"
 #define MyAppExeName "doolox.exe"
+
+; App version lives in version.iss (single source of truth for all targets).
+#include "version.iss"
 
 [Setup]
 ; Unique, stable identifier for this application. Keep it the same across

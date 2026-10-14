@@ -3,16 +3,23 @@
 #
 # Requires: go (with a C compiler for cgo/SQLite) and dpkg-deb.
 # Usage:    ./build-deb.sh
-# Output:   dist/doolox_1.0.0_amd64.deb
+# Output:   dist/doolox_<version>_amd64.deb
 set -eu
-
-VERSION="1.0.0"
-ARCH="amd64"
-PKG="doolox"
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 STAGE="$ROOT/build/deb"
 OUT_DIR="$ROOT/dist"
+
+# Version lives in version.iss (single source of truth, shared with installer.iss).
+VERSION="$(sed -n 's/^#define MyAppVersion "\([^"]*\)".*/\1/p' "$ROOT/version.iss" | head -n1)"
+ARCH="amd64"
+PKG="doolox"
+
+if [ -z "$VERSION" ]; then
+    echo "error: could not read MyAppVersion from $ROOT/version.iss" >&2
+    exit 1
+fi
+
 DEB_NAME="${PKG}_${VERSION}_${ARCH}.deb"
 
 # 1. Build the Linux binary (links SQLite via cgo, so a C compiler is needed).
@@ -55,7 +62,9 @@ rm -rf "$STAGE/.icons"
 chmod 0755 "$STAGE/usr/bin/doolox"
 chmod 0755 "$STAGE/DEBIAN/postinst" "$STAGE/DEBIAN/postrm"
 
-# 7. Fill in Installed-Size (in KiB) so dpkg-deb doesn't warn.
+# 7. Substitute the version placeholder in the control file, then fill in
+#    Installed-Size (in KiB) so dpkg-deb doesn't warn.
+sed -i "s/@VERSION@/$VERSION/" "$STAGE/DEBIAN/control"
 SIZE_KB="$(du -sk "$STAGE" | cut -f1)"
 sed -i '/^Installed-Size:/d' "$STAGE/DEBIAN/control"
 printf 'Installed-Size: %s\n' "$SIZE_KB" >> "$STAGE/DEBIAN/control"
