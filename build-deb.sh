@@ -36,7 +36,7 @@ mkdir -p "$STAGE/opt/doolox"
 install -m 0755 "$ROOT/bin/doolox" "$STAGE/opt/doolox/doolox"
 cp -R "$ROOT/assets" "$STAGE/opt/doolox/assets"
 
-# 4. Read-only seed data used to populate ~/Websites on first run.
+# 4. Read-only seed data used to populate ~/doolox/websites on first run.
 mkdir -p "$STAGE/opt/doolox/seed"
 cp -R "$ROOT/content" "$STAGE/opt/doolox/seed/content"
 cp "$ROOT/config.json" "$STAGE/opt/doolox/seed/config.json"

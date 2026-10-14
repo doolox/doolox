@@ -12,22 +12,22 @@
 ;      C:\Program Files\Doolox\
 ;          doolox.exe
 ;          assets\...                         (tray icon + assets)
-;      %USERPROFILE%\Websites\
-;          config.json
-;          doolox.db                         (pre-seeded example pages)
-;          content\...                       (templates + theme assets)
-;          docs\                             (empty; static site is generated here)
+;      %USERPROFILE%\doolox\
+;          websites\
+;              config.json
+;              doolox.db                     (pre-seeded example pages)
+;              content\...                   (templates + theme assets)
+;              docs\                         (empty; static site is generated here)
+;          templates\                        (empty; reserved for templates)
+;          doolox.log                        (created by the app at runtime)
 ;
-;  IMPORTANT: Doolox reads config.json, doolox.db, content\ and docs\ relative
-;  to its current working directory. The Start Menu shortcut therefore sets its
-;  "Start in" (WorkingDir) to %USERPROFILE%\Websites so the app works out of the
-;  box without any further setup.
+;  IMPORTANT: Doolox resolves its data directory (%USERPROFILE%\doolox) on its
+;  own, so it works out of the box regardless of the shortcut's working folder.
 ;
 ;  Finding your data: open File Explorer, click the address bar, type
-;      %USERPROFILE%\Websites
-;  and press Enter. That "Websites" is a real folder in your home directory
-;  (C:\Users\<you>\Websites). The Start Menu / desktop "Doolox" entries are only
-;  shortcuts to the doolox.exe program, not to your data. A "Doolox Websites"
+;      %USERPROFILE%\doolox
+;  and press Enter. The Start Menu / desktop "Doolox" entries are only
+;  shortcuts to the doolox.exe program, not to your data. A "Doolox data"
 ;  shortcut is added to the Start Menu to open the data folder directly.
 ; ============================================================================
 
@@ -82,32 +82,33 @@ Source: "bin\doolox-windows-amd64.exe"; DestDir: "{app}"; DestName: "{#MyAppExeN
 Source: "assets\*"; DestDir: "{app}\assets"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 ; ---------------------------------------------------------------------------
-; Writable user data -> %USERPROFILE%\Websites.
+; Writable user data -> %USERPROFILE%\doolox\websites.
 ; "onlyifdoesntexist" + "uninsneveruninstall" so reinstalls/upgrades and
 ; uninstalls never clobber or delete the user's site content and database.
 ; ---------------------------------------------------------------------------
-Source: "content\*"; DestDir: "{%USERPROFILE}\Websites\content"; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist uninsneveruninstall
-Source: "config.json"; DestDir: "{%USERPROFILE}\Websites"; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall
-Source: "doolox.db";  DestDir: "{%USERPROFILE}\Websites"; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall
+Source: "content\*"; DestDir: "{%USERPROFILE}\doolox\websites\content"; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist uninsneveruninstall
+Source: "config.json"; DestDir: "{%USERPROFILE}\doolox\websites"; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall
+Source: "doolox.db";  DestDir: "{%USERPROFILE}\doolox\websites"; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall
 
 [Dirs]
-; Empty docs folder: Doolox writes the generated static site here at runtime.
-Name: "{%USERPROFILE}\Websites\docs"; Flags: uninsneveruninstall
+; Empty docs folder (generated static site) and the reserved templates folder.
+Name: "{%USERPROFILE}\doolox\websites\docs"; Flags: uninsneveruninstall
+Name: "{%USERPROFILE}\doolox\templates"; Flags: uninsneveruninstall
 
 [Icons]
-; Start Menu entry. WorkingDir is what makes the app "just work" after install.
-Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{%USERPROFILE}\Websites"; IconFilename: "{app}\assets\trayicon.ico"; Comment: "Launch Doolox CMS"
+; Start Menu entry.
+Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{%USERPROFILE}\doolox\websites"; IconFilename: "{app}\assets\trayicon.ico"; Comment: "Launch Doolox CMS"
 
-; Optional desktop shortcut (same working directory).
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{%USERPROFILE}\Websites"; IconFilename: "{app}\assets\trayicon.ico"; Comment: "Launch Doolox CMS"; Tasks: desktopicon
+; Optional desktop shortcut.
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{%USERPROFILE}\doolox\websites"; IconFilename: "{app}\assets\trayicon.ico"; Comment: "Launch Doolox CMS"; Tasks: desktopicon
 
-; Shortcut that opens the Websites folder (your site data) in Explorer.
-Name: "{group}\Doolox Websites"; Filename: "{%USERPROFILE}\Websites"; Comment: "Open the folder where your website content is stored"
+; Shortcut that opens the data folder in Explorer.
+Name: "{group}\Doolox data"; Filename: "{%USERPROFILE}\doolox"; Comment: "Open the folder where your website data is stored"
 
 [Run]
 ; Optionally launch Doolox when the installer finishes.
 ; "nowait" is required: it is a system-tray app that keeps running until quit.
-Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{%USERPROFILE}\Websites"; Description: "Launch {#MyAppName} now"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{%USERPROFILE}\doolox\websites"; Description: "Launch {#MyAppName} now"; Flags: nowait postinstall skipifsilent
 
-; Open the Websites folder so it is easy to find after installing.
-Filename: "{%USERPROFILE}\Websites"; Description: "Open the Websites folder"; Flags: postinstall shellexec skipifsilent
+; Open the data folder so it is easy to find after installing.
+Filename: "{%USERPROFILE}\doolox"; Description: "Open the Doolox data folder"; Flags: postinstall shellexec skipifsilent

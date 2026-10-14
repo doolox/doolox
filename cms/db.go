@@ -2,13 +2,14 @@ package cms
 
 import (
 	"log"
+	"path/filepath"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
 func initDb() *gorm.DB {
-	db, err := gorm.Open("sqlite3", "doolox.db")
+	db, err := gorm.Open("sqlite3", filepath.Join(websitesDir(), "doolox.db"))
 
 	if err != nil {
 		log.Printf("[initDb] error: %s", err)

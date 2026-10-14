@@ -11,9 +11,6 @@ import (
 	macaron "gopkg.in/macaron.v1"
 )
 
-// docsDir is the folder the static website is generated into.
-const docsDir = "docs"
-
 // generateSite generates the static website from the pages in the database.
 // It is called from the system tray menu.
 func generateSite() {
@@ -49,7 +46,7 @@ func generate(render macaron.Render) int {
 			continue
 		}
 
-		path := filepath.Join(docsDir, page.URL+".html")
+		path := filepath.Join(docsDir(), page.URL+".html")
 
 		if err := os.WriteFile(path, []byte(html), 0644); err != nil {
 			log.Printf("[generate] error while writing %q: %v", path, err)
@@ -124,7 +121,7 @@ func generateSitemap(pages []*Page) error {
 		return err
 	}
 
-	path := filepath.Join(docsDir, "sitemap.xml")
+	path := filepath.Join(docsDir(), "sitemap.xml")
 	out := xml.Header + string(body) + "\n"
 
 	if err := os.WriteFile(path, []byte(out), 0644); err != nil {

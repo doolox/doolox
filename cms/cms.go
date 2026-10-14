@@ -17,6 +17,8 @@ var conf *Config
 var db *gorm.DB
 
 func init() {
+	setupDataDir()
+
 	conf = initConfig()
 
 	db = initDb()

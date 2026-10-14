@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+	"path/filepath"
 )
 
 // Config struct holds all our configuration
@@ -36,6 +37,6 @@ func (sc *Config) Load(configFile string) error {
 
 func initConfig() *Config {
 	c := &Config{}
-	c.Load("config.json")
+	c.Load(filepath.Join(websitesDir(), "config.json"))
 	return c
 }
