@@ -21,6 +21,13 @@
 ;  to its current working directory. The Start Menu shortcut therefore sets its
 ;  "Start in" (WorkingDir) to %USERPROFILE%\Websites so the app works out of the
 ;  box without any further setup.
+;
+;  Finding your data: open File Explorer, click the address bar, type
+;      %USERPROFILE%\Websites
+;  and press Enter. That "Websites" is a real folder in your home directory
+;  (C:\Users\<you>\Websites). The Start Menu / desktop "Doolox" entries are only
+;  shortcuts to the doolox.exe program, not to your data. A "Doolox Websites"
+;  shortcut is added to the Start Menu to open the data folder directly.
 ; ============================================================================
 
 #define MyAppName "Doolox"
@@ -91,7 +98,13 @@ Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{%
 ; Optional desktop shortcut (same working directory).
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{%USERPROFILE}\Websites"; IconFilename: "{app}\assets\trayicon.ico"; Comment: "Launch Doolox CMS"; Tasks: desktopicon
 
+; Shortcut that opens the Websites folder (your site data) in Explorer.
+Name: "{group}\Doolox Websites"; Filename: "{%USERPROFILE}\Websites"; Comment: "Open the folder where your website content is stored"
+
 [Run]
 ; Optionally launch Doolox when the installer finishes.
 ; "nowait" is required: it is a system-tray app that keeps running until quit.
 Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{%USERPROFILE}\Websites"; Description: "Launch {#MyAppName} now"; Flags: nowait postinstall skipifsilent
+
+; Open the Websites folder so it is easy to find after installing.
+Filename: "{%USERPROFILE}\Websites"; Description: "Open the Websites folder"; Flags: postinstall shellexec skipifsilent
