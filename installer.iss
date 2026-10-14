@@ -5,7 +5,8 @@
 ;
 ;  Build the Windows binary FIRST (from PowerShell in the project root):
 ;      .\build.ps1
-;  which produces bin\doolox-windows-amd64.exe. Then compile this script.
+;  which produces bin\doolox-windows-amd64.exe. Then compile this script
+;  (ISCC.exe installer.iss) -> dist\doolox-setup-1.0.0.exe.
 ;
 ;  Layout after install:
 ;      C:\Program Files\Doolox\
@@ -56,7 +57,7 @@ PrivilegesRequired=admin
 ArchitecturesAllowed=x64
 ArchitecturesInstallIn64BitMode=x64
 
-OutputDir=installer
+OutputDir=dist
 OutputBaseFilename=doolox-setup-{#MyAppVersion}
 
 Compression=lzma2

@@ -76,6 +76,13 @@ Option B — Git Bash / MSYS2 with `make` and MinGW-w64 gcc:
 make build-windows  # -> bin/doolox-windows-amd64.exe
 ```
 
+Option C — Inno Setup installer (requires Inno Setup 6+):
+
+```powershell
+.\build.ps1               # first build the Windows binary
+ISCC.exe installer.iss    # -> dist\doolox-setup-1.0.0.exe
+```
+
 ## Cross-compilation (optional)
 
 Cross-compiling requires the matching **cross C compiler** (because of cgo):
