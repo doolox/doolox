@@ -1,6 +1,6 @@
-doolox
-bin/
-build/
-dist/
-installer/
+/doolox
+/bin/
+/build/
+/dist/
+/installer/
 *.deb
