@@ -5,7 +5,7 @@ Priority: optional
 Architecture: amd64
 Maintainer: Doolox <support@doolox.com>
 Homepage: https://doolox.com
-Depends: libc6
+Depends: libc6, hicolor-icon-theme
 Description: Simple CMS and static website builder
  Doolox is a simple CMS and static website builder. It runs a local web
  server and lives in the system tray, and can generate a static site into

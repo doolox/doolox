@@ -35,11 +35,21 @@ cp -R "$ROOT/content" "$STAGE/opt/doolox/seed/content"
 cp "$ROOT/config.json" "$STAGE/opt/doolox/seed/config.json"
 cp "$ROOT/doolox.db" "$STAGE/opt/doolox/seed/doolox.db"
 
-# 5. Icons -> hicolor icon theme (referenced by the .desktop file as "doolox").
+# 5. Icons -> hicolor theme + pixmaps fallback (the .desktop uses Icon=doolox).
+#    Render PNGs at multiple sizes from the SVG (reusing the project's Go
+#    deps, so no ImageMagick/rsvg is needed), then install them along with a
+#    pixmaps copy that desktop menus can find even without an icon-theme cache.
+( cd "$ROOT" && go run ./tools/rendericons assets/trayicon.svg "$STAGE/.icons" )
+
+for S in 16 24 32 48 64 128 256; do
+    mkdir -p "$STAGE/usr/share/icons/hicolor/${S}x${S}/apps"
+    cp "$STAGE/.icons/doolox-${S}.png" "$STAGE/usr/share/icons/hicolor/${S}x${S}/apps/doolox.png"
+done
 mkdir -p "$STAGE/usr/share/icons/hicolor/scalable/apps"
-mkdir -p "$STAGE/usr/share/icons/hicolor/32x32/apps"
 cp "$ROOT/assets/trayicon.svg" "$STAGE/usr/share/icons/hicolor/scalable/apps/doolox.svg"
-cp "$ROOT/assets/trayicon.png" "$STAGE/usr/share/icons/hicolor/32x32/apps/doolox.png"
+mkdir -p "$STAGE/usr/share/pixmaps"
+cp "$STAGE/.icons/doolox-256.png" "$STAGE/usr/share/pixmaps/doolox.png"
+rm -rf "$STAGE/.icons"
 
 # 6. Make the launcher and maintainer scripts executable.
 chmod 0755 "$STAGE/usr/bin/doolox"
