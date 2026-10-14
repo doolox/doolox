@@ -76,22 +76,22 @@ Source: "assets\*"; DestDir: "{app}\assets"; Flags: ignoreversion recursesubdirs
 ; "onlyifdoesntexist" + "uninsneveruninstall" so reinstalls/upgrades and
 ; uninstalls never clobber or delete the user's site content and database.
 ; ---------------------------------------------------------------------------
-Source: "content\*"; DestDir: "{userprofile}\Websites\content"; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist uninsneveruninstall
-Source: "config.json"; DestDir: "{userprofile}\Websites"; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall
-Source: "doolox.db";  DestDir: "{userprofile}\Websites"; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall
+Source: "content\*"; DestDir: "{%USERPROFILE}\Websites\content"; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist uninsneveruninstall
+Source: "config.json"; DestDir: "{%USERPROFILE}\Websites"; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall
+Source: "doolox.db";  DestDir: "{%USERPROFILE}\Websites"; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall
 
 [Dirs]
 ; Empty docs folder: Doolox writes the generated static site here at runtime.
-Name: "{userprofile}\Websites\docs"; Flags: uninsneveruninstall
+Name: "{%USERPROFILE}\Websites\docs"; Flags: uninsneveruninstall
 
 [Icons]
 ; Start Menu entry. WorkingDir is what makes the app "just work" after install.
-Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{userprofile}\Websites"; IconFilename: "{app}\assets\trayicon.ico"; Comment: "Launch Doolox CMS"
+Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{%USERPROFILE}\Websites"; IconFilename: "{app}\assets\trayicon.ico"; Comment: "Launch Doolox CMS"
 
 ; Optional desktop shortcut (same working directory).
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{userprofile}\Websites"; IconFilename: "{app}\assets\trayicon.ico"; Comment: "Launch Doolox CMS"; Tasks: desktopicon
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{%USERPROFILE}\Websites"; IconFilename: "{app}\assets\trayicon.ico"; Comment: "Launch Doolox CMS"; Tasks: desktopicon
 
 [Run]
 ; Optionally launch Doolox when the installer finishes.
 ; "nowait" is required: it is a system-tray app that keeps running until quit.
-Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{userprofile}\Websites"; Description: "Launch {#MyAppName} now"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{%USERPROFILE}\Websites"; Description: "Launch {#MyAppName} now"; Flags: nowait postinstall skipifsilent
