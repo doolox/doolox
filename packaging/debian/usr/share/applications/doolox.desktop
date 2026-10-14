@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Doolox
+GenericName=Static website builder
+Comment=Simple CMS and static website builder
+Exec=/usr/bin/doolox
+Icon=doolox
+Terminal=false
+Categories=Development;WebDevelopment;
+Keywords=CMS;website;static;builder;

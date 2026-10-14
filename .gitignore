@@ -1,2 +1,5 @@
 doolox
 bin/
+build/
+dist/
+*.deb

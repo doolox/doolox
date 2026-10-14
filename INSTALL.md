@@ -19,6 +19,36 @@ make build          # -> bin/doolox
 ./bin/doolox
 ```
 
+## Debian / Ubuntu / Linux Mint (.deb package)
+
+Build the installer (requires `dpkg-deb` and a C compiler for cgo):
+
+```sh
+make build-deb       # -> dist/doolox_1.0.0_amd64.deb
+# or
+./build-deb.sh
+```
+
+Install it:
+
+```sh
+sudo apt install ./dist/doolox_1.0.0_amd64.deb
+```
+
+This installs the binary to `/opt/doolox`, a launcher to `/usr/bin/doolox`,
+a menu entry and icons, plus the bundled templates/database. On first launch a
+`Websites` folder is created in your home directory containing `content/`, an
+empty `docs/` folder, `config.json` and `doolox.db`. Run `doolox` from a
+terminal or launch it from the application menu.
+
+Remove it with:
+
+```sh
+sudo apt remove doolox
+```
+
+(User data in `~/Websites` is left untouched on removal.)
+
 ## macOS
 
 The macOS build must happen **on a Mac**, because the menu-bar icon depends
@@ -71,6 +101,7 @@ make fmt        # format all Go sources
 make tidy       # tidy module dependencies
 make clean      # remove bin/
 make install    # go install the binary
+make build-deb  # build a .deb package for Debian/Ubuntu/Linux Mint
 make help       # list all targets
 ```
 

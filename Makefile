@@ -21,7 +21,7 @@ CC_LINUX   ?= x86_64-linux-gnu-gcc
 CC_WINDOWS ?= x86_64-w64-mingw32-gcc
 
 .PHONY: all build run test vet fmt tidy clean install \
-        build-linux build-windows build-darwin help
+        build-linux build-windows build-darwin build-deb help
 
 all: build ## Build the binary (default target)
 
@@ -62,6 +62,9 @@ build-darwin: ## Build for macOS (must be run on macOS)
 	@test "$$(go env GOOS)" = "darwin" || { echo "error: build-darwin requires macOS (tray icon uses cgo/Objective-C)"; exit 1; }
 	@mkdir -p $(BIN_DIR)
 	CGO_ENABLED=1 $(GO) build $(GOFLAGS) -ldflags "$(LDFLAGS)" -o $(BIN_DIR)/$(APP)-darwin $(PKG)
+
+build-deb: ## Build a .deb package for Debian/Ubuntu/Linux Mint
+	./build-deb.sh
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-16s %s\n", $$1, $$2}'
