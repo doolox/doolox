@@ -1,0 +1,127 @@
+# Builds the Debian package (.deb) and the Windows installer (.exe), then
+# publishes them as a GitHub Release whenever a change is pushed to the
+# `release` branch.
+#
+# The release tag/name come from the version in `version.iss` (single source
+# of truth), e.g. version "1.0.0" -> tag "v1.0.0" and assets:
+#   dist/doolox_1.0.0_amd64.deb
+#   dist/doolox-setup-1.0.0.exe
+name: Release
+
+on:
+  push:
+    branches:
+      - release
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Debian / Ubuntu / Linux Mint package
+  # ---------------------------------------------------------------------------
+  build-deb:
+    name: Build .deb
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Install build dependencies
+        run: sudo apt-get update && sudo apt-get install -y build-essential
+
+      - name: Build .deb
+        run: make build-deb
+
+      - name: Upload .deb artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: deb
+          path: dist/*.deb
+          if-no-files-found: error
+
+  # ---------------------------------------------------------------------------
+  # Windows installer (Inno Setup)
+  # ---------------------------------------------------------------------------
+  build-exe:
+    name: Build .exe
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Install MinGW-w64 gcc and Inno Setup
+        shell: pwsh
+        run: choco install mingw innosetup -y --no-progress
+
+      - name: Build Windows binary
+        shell: pwsh
+        run: .\build.ps1
+
+      - name: Compile installer
+        shell: pwsh
+        run: ISCC.exe installer.iss
+
+      - name: Upload .exe artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: exe
+          path: dist/*.exe
+          if-no-files-found: error
+
+  # ---------------------------------------------------------------------------
+  # Publish a GitHub Release with both artifacts.
+  # ---------------------------------------------------------------------------
+  release:
+    name: Publish GitHub Release
+    needs: [build-deb, build-exe]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read version from version.iss
+        id: version
+        run: |
+          VERSION="$(sed -n 's/^#define MyAppVersion "\([^"]*\)".*/\1/p' version.iss | head -n1)"
+          if [ -z "$VERSION" ]; then
+            echo "::error::could not read MyAppVersion from version.iss"
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          TAG="v${VERSION}"
+
+          # Idempotent: drop any previous release/tag with the same name, so
+          # re-pushing the release branch with an unchanged version still works.
+          gh release delete "$TAG" --yes --cleanup-tag 2>/dev/null || true
+
+          gh release create "$TAG" \
+            artifacts/deb/*.deb \
+            artifacts/exe/*.exe \
+            --title "Doolox ${VERSION}" \
+            --target "$GITHUB_SHA" \
+            --generate-notes
