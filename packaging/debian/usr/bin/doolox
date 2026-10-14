@@ -1,0 +1,31 @@
+#!/bin/sh
+# Doolox launcher.
+#
+# The Doolox binary resolves config.json, doolox.db, content/ and docs/
+# relative to its current working directory. This wrapper makes sure a
+# per-user "Websites" folder exists (seeding it from the bundled templates
+# and example database on first run), then launches the server from there.
+#
+# Set DOOLOX_HOME to override the data location (defaults to ~/Websites).
+set -e
+
+APP_DIR="/opt/doolox"
+SEED_DIR="/opt/doolox/seed"
+SITE_DIR="${DOOLOX_HOME:-$HOME/Websites}"
+
+# Seed anything that is missing, but never overwrite existing files, so a
+# user's edited content and database are preserved across launches.
+mkdir -p "$SITE_DIR"
+if [ ! -d "$SITE_DIR/content" ]; then
+    cp -R "$SEED_DIR/content" "$SITE_DIR/"
+fi
+if [ ! -f "$SITE_DIR/config.json" ]; then
+    cp "$SEED_DIR/config.json" "$SITE_DIR/"
+fi
+if [ ! -f "$SITE_DIR/doolox.db" ]; then
+    cp "$SEED_DIR/doolox.db" "$SITE_DIR/"
+fi
+mkdir -p "$SITE_DIR/docs"
+
+cd "$SITE_DIR"
+exec "$APP_DIR/doolox" "$@"
