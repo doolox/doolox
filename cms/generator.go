@@ -16,6 +16,7 @@ import (
 func generateSite() {
 	generated := generate(newRenderer())
 	log.Printf("generated %d pages", generated)
+	notify("Doolox", fmt.Sprintf("Site generated: %d pages", generated))
 }
 
 // generate renders every page stored in the database to a static HTML file
