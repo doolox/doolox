@@ -36,7 +36,7 @@ func Start(trayIcon TrayIcon) {
 	m.Get("/:page", pageView)
 
 	server := &http.Server{
-		Addr:    "0.0.0.0:5000",
+		Addr:    "127.0.0.1:5000",
 		Handler: m,
 	}
 
