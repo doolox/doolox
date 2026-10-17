@@ -5,4 +5,4 @@
 /installer/
 *.deb
 admin-lte-v4.10.1.zip
-admin/theme/static/adminlte/
+/adminlte/

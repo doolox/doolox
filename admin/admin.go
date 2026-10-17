@@ -10,10 +10,9 @@ import (
 // addr is the address the admin web server listens on.
 const addr = ":5555"
 
-// adminlteDist is the directory holding the AdminLTE distribution (css, js,
-// images, ...). It is ignored by git and populated by unpacking the AdminLTE
-// release archive into admin/theme/static.
-const adminlteDist = "admin/theme/static/adminlte"
+// staticDir is the directory holding the static assets (css, js, images, ...)
+// served under /assets. These files are committed and tracked by git.
+const staticDir = "admin/theme/static"
 
 //go:embed theme/templates/*.html
 var templatesFS embed.FS
@@ -40,8 +39,8 @@ func Start() {
 func handler() http.Handler {
 	mux := http.NewServeMux()
 
-	// AdminLTE static assets served from admin/theme/static/adminlte.
-	mux.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir(adminlteDist))))
+	// Static assets (AdminLTE css/js, ...) served from admin/theme/static.
+	mux.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir(staticDir))))
 
 	// Doolox logo (embedded in the binary).
 	mux.HandleFunc("/logo.svg", func(w http.ResponseWriter, r *http.Request) {

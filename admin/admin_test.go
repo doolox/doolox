@@ -24,6 +24,7 @@ func TestIndex(t *testing.T) {
 		"app-wrapper",
 		"sidebar-brand",
 		"Lorem ipsum dolor",
+		"/assets/favicon.png",
 	} {
 		if !strings.Contains(body, want) {
 			t.Errorf("index body missing %q", want)
