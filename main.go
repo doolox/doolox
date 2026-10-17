@@ -3,6 +3,7 @@ package main
 import (
 	_ "embed"
 
+	"doolox/admin"
 	"doolox/cms"
 )
 
@@ -16,6 +17,8 @@ var trayIconPNG []byte
 var trayIconICO []byte
 
 func main() {
+	go admin.Start()
+
 	cms.Start(cms.TrayIcon{
 		SVG: trayIconSVG,
 		PNG: trayIconPNG,

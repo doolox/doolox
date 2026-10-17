@@ -23,6 +23,8 @@ func init() {
 
 	db = initDb()
 
+	setupWebsiteDir()
+
 	m = initMacaron()
 }
 

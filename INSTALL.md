@@ -37,9 +37,10 @@ sudo apt install ./dist/doolox_*.deb
 
 This installs the binary to `/opt/doolox`, a launcher to `/usr/bin/doolox`,
 a menu entry and icons, plus the bundled templates/database. On first launch a
-`doolox` folder is created in your home directory, with a `websites/` subfolder
-containing `content/`, an empty `docs/` folder, `config.json` and `doolox.db`,
-plus an empty `templates/` folder. Logs are written to `~/doolox/doolox.log`.
+`doolox` folder is created in your home directory, containing `config.json`
+and `doolox.db`, plus a `websites/` subfolder with `content/` and an empty
+`docs/` folder, and an empty `templates/` folder. Logs are written to
+`~/doolox/doolox.log`.
 Run `doolox` from a terminal or launch it from the application menu.
 
 Remove it with:
@@ -122,6 +123,11 @@ make help       # list all targets
 - The tray icon assets (`assets/trayicon.svg`, `assets/trayicon.png`,
   `assets/trayicon.ico`) are embedded into the binary at build time with
   `go:embed`, so no extra runtime files are needed.
+- The admin web interface assets (`admin/theme/`) are shipped next to the
+  binary by both installers (`/opt/doolox/admin/theme` on Linux,
+  `C:\Program Files\Doolox\admin\theme` on Windows) and served by the admin
+  server at http://localhost:5555. The HTML templates and logo are embedded
+  with `go:embed`; only the CSS/JS/favicon are read from disk at runtime.
 - The app version is configured in `version.iss` — the single source of truth
   used by both the Inno Setup (`installer.iss`) and Debian (`build-deb.sh`)
   packaging. Bump it there and rebuild.

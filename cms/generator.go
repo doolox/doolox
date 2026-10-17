@@ -14,23 +14,38 @@ import (
 // generateSite generates the static website from the pages in the database.
 // It is called from the system tray menu.
 func generateSite() {
-	generated := generate(newRenderer())
+	GenerateSite()
+}
+
+// GenerateSite generates the static website from the pages in the database,
+// shows a system notification, and returns the number of generated pages or an
+// error.
+func GenerateSite() (int, error) {
+	generated, err := generate(newRenderer())
+	if err != nil {
+		log.Printf("[generate] error: %v", err)
+		notify("Doolox", fmt.Sprintf("Site generation failed: %v", err))
+		return generated, err
+	}
+
 	log.Printf("generated %d pages", generated)
 	notify("Doolox", fmt.Sprintf("Site generated: %d pages", generated))
+	return generated, nil
 }
 
 // generate renders every page stored in the database to a static HTML file
-// inside docs and returns how many files were written. The sitemap of the
-// generated pages is written as well.
+// inside docs and returns how many files were written plus the first error
+// encountered, if any. The sitemap of the generated pages is written as well.
 //
 // It does not crawl anything, the pages are read from the database. Files that
 // already exist are overridden, folders are never created or copied, only
 // plain HTML files are written.
-func generate(render macaron.Render) int {
+func generate(render macaron.Render) (int, error) {
 	pages := []*Page{}
 	db.Find(&pages)
 
 	generated := []*Page{}
+	var firstErr error
 
 	for _, page := range pages {
 		if !isPageURL(page.URL) {
@@ -44,6 +59,9 @@ func generate(render macaron.Render) int {
 			macaron.HTMLOptions{Layout: layoutFor(page.URL)})
 		if err != nil {
 			log.Printf("[generate] error while rendering %q: %v", page.URL, err)
+			if firstErr == nil {
+				firstErr = err
+			}
 			continue
 		}
 
@@ -51,6 +69,9 @@ func generate(render macaron.Render) int {
 
 		if err := os.WriteFile(path, []byte(html), 0644); err != nil {
 			log.Printf("[generate] error while writing %q: %v", path, err)
+			if firstErr == nil {
+				firstErr = err
+			}
 			continue
 		}
 
@@ -60,9 +81,12 @@ func generate(render macaron.Render) int {
 
 	if err := generateSitemap(generated); err != nil {
 		log.Printf("[generate] error while writing the sitemap: %v", err)
+		if firstErr == nil {
+			firstErr = err
+		}
 	}
 
-	return len(generated)
+	return len(generated), firstErr
 }
 
 // isPageURL reports whether the url can be generated as a page. Requests for

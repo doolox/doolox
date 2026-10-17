@@ -37,7 +37,13 @@ func pageView(ctx *macaron.Context) {
 }
 
 func generateView(ctx *macaron.Context) {
-	generated := generate(ctx.Render)
+	generated, err := generate(ctx.Render)
+	if err != nil {
+		ctx.Render.PlainText(
+			http.StatusInternalServerError,
+			[]byte(fmt.Sprintf("generation failed: %v\n", err)))
+		return
+	}
 
 	ctx.Render.PlainText(
 		http.StatusOK,
