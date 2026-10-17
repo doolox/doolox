@@ -108,6 +108,7 @@ func clearWebsiteOutput() error {
 	keep := map[string]struct{}{
 		"src":         {},
 		"config.json": {},
+		".git":        {},
 	}
 	activeSource := contentDir()
 	if filepath.Dir(activeSource) == websiteDir() {

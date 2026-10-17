@@ -122,6 +122,13 @@ func TestGenerateWritesToWebsiteRoot(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
+	gitDir := filepath.Join(websiteDir(), ".git")
+	if err := os.MkdirAll(gitDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(gitDir, "config"), []byte("git config"), 0644); err != nil {
+		t.Fatal(err)
+	}
 	staleAssets := filepath.Join(websiteDir(), "assets")
 	if err := os.MkdirAll(staleAssets, 0755); err != nil {
 		t.Fatal(err)
@@ -143,7 +150,7 @@ func TestGenerateWritesToWebsiteRoot(t *testing.T) {
 			t.Errorf("generated file %q missing from website root: %v", name, err)
 		}
 	}
-	for _, name := range []string{"config.json", "README.md", "CNAME"} {
+	for _, name := range []string{"config.json", "README.md", "CNAME", filepath.Join(".git", "config")} {
 		if _, err := os.Stat(filepath.Join(websiteDir(), name)); err != nil {
 			t.Errorf("preserved file %q is missing: %v", name, err)
 		}
