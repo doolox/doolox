@@ -138,6 +138,11 @@ make help       # list all targets
 - The native web view uses `webview/webview_go`, vendored under
   `third_party/webview_go` with a one-line patch to build against WebKitGTK
   4.1 (Ubuntu 24.04+ / Debian 13); see the `replace` directive in `go.mod`.
+- On Linux, WebKitGTK's JavaScriptCore conflicts with the Go runtime over
+  signal handling (it aborts with "Overriding existing handler for signal
+  10"). The dashboard works around it by setting `JSC_SIGNAL_FOR_GC=18`
+  (SIGCONT); if that signal is unsuitable, override it with the
+  `JSC_SIGNAL_FOR_GC` environment variable.
 - The app version is configured in `version.iss` — the single source of truth
   used by both the Inno Setup (`installer.iss`) and Debian (`build-deb.sh`)
   packaging. Bump it there and rebuild.
