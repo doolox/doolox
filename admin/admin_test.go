@@ -23,7 +23,7 @@ func TestIndex(t *testing.T) {
 		"Hello World",
 		"app-wrapper",
 		"sidebar-brand",
-		"Lorem ipsum dolor",
+		"static website builder",
 		"/assets/favicon.png",
 	} {
 		if !strings.Contains(body, want) {
