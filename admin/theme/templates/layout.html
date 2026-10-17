@@ -112,14 +112,14 @@
           <div class="container-fluid">
             <div class="row">
               <div class="col-sm-6">
-                <h1 class="mb-0">Pages</h1>
+                <h1 class="mb-0">Generate website</h1>
               </div>
               <div class="col-sm-6">
                 <nav aria-label="breadcrumb">
                   <ol class="breadcrumb float-sm-end">
                     <li class="breadcrumb-item"><a href="/">Home</a></li>
                     <li class="breadcrumb-item active" aria-current="page">
-                      Pages
+                      Generate website
                     </li>
                   </ol>
                 </nav>
@@ -147,67 +147,23 @@
             </div>
             {{end}}
 
-            <!--begin::Actions-->
-            <div class="mb-3">
-              <button type="button" class="btn btn-primary me-2">
-                <i class="bi bi-file-earmark-plus me-1"></i> Add Page
-              </button>
-              <button type="button" class="btn btn-success">
-                <i class="bi bi-file-earmark-text me-1"></i> Add Post
-              </button>
-            </div>
-            <!--end::Actions-->
-
-            <!--begin::Pages List-->
+            <!--begin::Generate Card-->
             <div class="card">
               <div class="card-header">
-                <h3 class="card-title">Existing pages</h3>
+                <h3 class="card-title">Static website builder</h3>
               </div>
-              <div class="card-body p-0">
-                <table class="table table-hover mb-0">
-                  <thead>
-                    <tr>
-                      <th>Page</th>
-                      <th>Type</th>
-                      <th class="text-end">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {{range .Pages}}
-                    <tr>
-                      <td>
-                        <a
-                          href="http://localhost:5000/{{.URL}}"
-                          class="text-danger"
-                        >{{if .Title}}{{.Title}}{{else}}{{.URL}}{{end}}</a>
-                      </td>
-                      <td>{{.Type}}</td>
-                      <td class="text-end">
-                        <form
-                          method="post"
-                          action="/delete"
-                          class="d-inline"
-                          onsubmit="return confirm('Delete this page?');"
-                        >
-                          <input type="hidden" name="url" value="{{.URL}}" />
-                          <button type="submit" class="btn btn-sm btn-danger">
-                            <i class="bi bi-trash me-1"></i>Delete
-                          </button>
-                        </form>
-                      </td>
-                    </tr>
-                    {{else}}
-                    <tr>
-                      <td colspan="3" class="text-center text-muted py-3">
-                        No pages yet.
-                      </td>
-                    </tr>
-                    {{end}}
-                  </tbody>
-                </table>
+              <div class="card-body">
+                <p class="mb-3">
+                  Generate the static version of your website from the page
+                  files in your content folder. The result is written to the
+                  <code>docs</code> directory, ready to deploy anywhere.
+                </p>
+                <a href="/generate" class="btn btn-success">
+                  <i class="bi bi-globe me-1"></i>Generate website
+                </a>
               </div>
             </div>
-            <!--end::Pages List-->
+            <!--end::Generate Card-->
           </div>
         </div>
         <!--end::App Content-->

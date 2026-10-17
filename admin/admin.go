@@ -50,7 +50,6 @@ var indexTmpl = template.Must(template.ParseFS(templatesFS, "theme/templates/*.h
 // pageData holds the values injected into the layout template.
 type pageData struct {
 	Version string
-	Pages   []cms.Page
 	Message string
 	Error   bool
 }
@@ -108,25 +107,6 @@ func handler() http.Handler {
 		w.Write(logo)
 	})
 
-	// Delete a page (POST) and redirect back to the index.
-	mux.HandleFunc("/delete", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
-			return
-		}
-		url := r.FormValue("url")
-		if url == "" {
-			http.Error(w, "missing url", http.StatusBadRequest)
-			return
-		}
-		if err := cms.DeletePage(url); err != nil {
-			log.Printf("[admin] delete %q: %v", url, err)
-			http.Error(w, "could not delete page", http.StatusInternalServerError)
-			return
-		}
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-	})
-
 	// Generate the static website and redirect back to the index with a success
 	// or error message.
 	mux.HandleFunc("/generate", func(w http.ResponseWriter, r *http.Request) {
@@ -148,7 +128,6 @@ func handler() http.Handler {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		data := pageData{
 			Version: appVersion(),
-			Pages:   cms.Pages(),
 			Message: r.URL.Query().Get("msg"),
 			Error:   r.URL.Query().Get("status") == "error",
 		}

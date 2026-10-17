@@ -1,16 +1,15 @@
 # Installing and building Doolox
 
-Doolox is a Go program that links **SQLite through cgo**
-(`github.com/mattn/go-sqlite3`), so a **C compiler is required on every
-platform**. The menu-bar icon also uses cgo/Objective-C on macOS.
+Doolox is a Go program. A **C compiler is only required on macOS**, where the
+menu-bar icon uses cgo/Objective-C. Linux and Windows builds are pure Go.
 
 ## Prerequisites
 
-| OS        | Requirements                                                                          |
-|-----------|----------------------------------------------------------------------------------------|
-| Linux     | Go 1.26+ and gcc (`sudo apt install build-essential`)                                  |
-| macOS     | Go 1.26+ and Xcode Command Line Tools (`xcode-select --install`)                       |
-| Windows   | Go 1.26+ and MinGW-w64 gcc (https://www.mingw-w64.org/)                                |
+| OS        | Requirements                                                       |
+|-----------|---------------------------------------------------------------------|
+| Linux     | Go 1.26+                                                           |
+| macOS     | Go 1.26+ and Xcode Command Line Tools (`xcode-select --install`)   |
+| Windows   | Go 1.26+                                                           |
 
 ## Linux
 
@@ -21,7 +20,7 @@ make build          # -> bin/doolox
 
 ## Debian / Ubuntu / Linux Mint (.deb package)
 
-Build the installer (requires `dpkg-deb` and a C compiler for cgo):
+Build the installer (requires `dpkg-deb`):
 
 ```sh
 make build-deb       # -> dist/doolox_<version>_amd64.deb
@@ -36,11 +35,10 @@ sudo apt install ./dist/doolox_*.deb
 ```
 
 This installs the binary to `/opt/doolox`, a launcher to `/usr/bin/doolox`,
-a menu entry and icons, plus the bundled templates/database. On first launch a
-`doolox` folder is created in your home directory, containing `config.json`
-and `doolox.db`, plus a `websites/` subfolder with `content/` and an empty
-`docs/` folder, and an empty `templates/` folder. Logs are written to
-`~/doolox/doolox.log`.
+a menu entry and icons, plus the bundled templates and config. On first launch
+a `doolox` folder is created in your home directory, containing `config.json`,
+plus a `websites/` subfolder with `content/` and an empty `docs/` folder, and
+an empty `templates/` folder. Logs are written to `~/doolox/doolox.log`.
 Run `doolox` from a terminal or launch it from the application menu.
 
 Remove it with:
@@ -72,7 +70,7 @@ Option A — PowerShell (no `make` required):
 .\build.ps1         # -> bin\doolox-windows-amd64.exe
 ```
 
-Option B — Git Bash / MSYS2 with `make` and MinGW-w64 gcc:
+Option B — Git Bash / MSYS2 with `make`:
 
 ```sh
 make build-windows  # -> bin/doolox-windows-amd64.exe
@@ -87,14 +85,14 @@ ISCC.exe installer.iss    # -> dist\doolox-setup-<version>.exe
 
 ## Cross-compilation (optional)
 
-Cross-compiling requires the matching **cross C compiler** (because of cgo):
+Linux and Windows builds are pure Go, so cross-compiling needs no C toolchain:
 
 ```sh
-# on Linux/macOS, build a Windows binary (needs x86_64-w64-mingw32-gcc):
-make build-windows CC=x86_64-w64-mingw32-gcc
+# on Linux/macOS, build a Windows binary:
+make build-windows
 
-# on macOS/Windows, build a Linux binary (needs x86_64-linux-gnu-gcc):
-make build-linux CC=x86_64-linux-gnu-gcc
+# on macOS/Windows, build a Linux binary:
+make build-linux
 ```
 
 macOS cannot be cross-compiled from other OSes (Objective-C + cgo); build it
@@ -119,7 +117,23 @@ make help       # list all targets
 - `go.mod` declares `go 1.26.5`.
 - `build-windows` / `build.ps1` pass `-H=windowsgui` so the app does not open
   a console window when launched.
-- All platforms build with cgo enabled (`CGO_ENABLED=1`) because of SQLite.
+- Pages are plain files in `content/pages/*.html`. Each page's metadata
+  (`title`, `subtitle`, `description`, `type`) lives in an optional
+  front-matter comment at the top of the file:
+
+  ```html
+  <!--
+  title: About Doolox
+  subtitle: About
+  type: page
+  -->
+  {{define "about"}} ... {{end}}
+  ```
+
+  The page URL is the file name without the extension (`about.html` ->
+  `/about`); `index.html` is the home page.
+- The website name is set in `config.json` (`"website"`) and defaults to
+  `doolox`; it names the folder under `~/doolox/websites/`.
 - The tray icon assets (`assets/trayicon.svg`, `assets/trayicon.png`,
   `assets/trayicon.ico`) are embedded into the binary at build time with
   `go:embed`, so no extra runtime files are needed.

@@ -41,18 +41,12 @@ func GenerateSite() (int, error) {
 // already exist are overridden, folders are never created or copied, only
 // plain HTML files are written.
 func generate(render macaron.Render) (int, error) {
-	pages := []*Page{}
-	db.Find(&pages)
+	pages := pages()
 
 	generated := []*Page{}
 	var firstErr error
 
 	for _, page := range pages {
-		if !isPageURL(page.URL) {
-			log.Printf("[generate] %q skipped, not a page url", page.URL)
-			continue
-		}
-
 		html, err := render.HTMLString(
 			page.URL,
 			map[string]interface{}{"Page": page},
@@ -87,14 +81,6 @@ func generate(render macaron.Render) (int, error) {
 	}
 
 	return len(generated), firstErr
-}
-
-// isPageURL reports whether the url can be generated as a page. Requests for
-// static files such as /favicon.png end up in the database as pages too, those
-// are not pages: they are not generated, only page urls without an extension
-// or a folder are.
-func isPageURL(url string) bool {
-	return url != "" && !strings.ContainsAny(url, "/.")
 }
 
 // sitemap is the sitemap.xml document, see https://www.sitemaps.org/protocol.html
@@ -136,7 +122,7 @@ func generateSitemap(pages []*Page) error {
 
 		sm.URLs = append(sm.URLs, sitemapURL{
 			Loc:      loc,
-			Lastmod:  page.UpdatedAt.UTC().Format("2006-01-02T15:04:05-07:00"),
+			Lastmod:  page.Lastmod.UTC().Format("2006-01-02T15:04:05-07:00"),
 			Priority: priority,
 		})
 	}

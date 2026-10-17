@@ -4,8 +4,7 @@
     Build Doolox for Windows (native build, no `make` required).
 
 .DESCRIPTION
-    Requires Go 1.26+ and a C compiler (MinGW-w64 gcc), because Doolox links
-    SQLite through cgo.
+    Requires Go 1.26+.
 
 .EXAMPLE
     .\build.ps1
@@ -21,18 +20,10 @@ if (-not (Get-Command go -ErrorAction SilentlyContinue)) {
     exit 1
 }
 
-if (-not (Get-Command gcc -ErrorAction SilentlyContinue)) {
-    Write-Error @"
-No C compiler (gcc) found on PATH. Doolox links SQLite via cgo, so a C compiler
-is required. Install MinGW-w64 (https://www.mingw-w64.org/) and add gcc to PATH.
-"@
-    exit 1
-}
-
 New-Item -ItemType Directory -Force -Path "bin" | Out-Null
 
 Write-Host "Building Doolox for windows/amd64..."
-$env:CGO_ENABLED = "1"
+$env:CGO_ENABLED = "0"
 go build -trimpath -ldflags "-s -w -H=windowsgui" -o "bin\doolox-windows-amd64.exe" .
 if ($LASTEXITCODE -ne 0) { throw "Windows build failed" }
 

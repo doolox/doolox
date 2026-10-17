@@ -25,7 +25,7 @@ func dataRoot() string {
 }
 
 // websitesDir is where the websites live, one subfolder per website.
-// config.json and doolox.db live in dataRoot.
+// config.json lives in dataRoot.
 func websitesDir() string { return filepath.Join(dataRoot(), "websites") }
 
 // websiteDir is the folder of the current website, named after the website

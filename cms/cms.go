@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/jinzhu/gorm"
 	"gopkg.in/macaron.v1"
 )
 
@@ -14,14 +13,10 @@ var m *macaron.Macaron
 
 var conf *Config
 
-var db *gorm.DB
-
 func init() {
 	setupDataDir()
 
 	conf = initConfig()
-
-	db = initDb()
 
 	setupWebsiteDir()
 
