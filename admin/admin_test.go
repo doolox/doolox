@@ -61,22 +61,89 @@ func TestUnknownPathIsNotFound(t *testing.T) {
 }
 
 func TestIndexShowsFlashMessage(t *testing.T) {
-	req := httptest.NewRequest(http.MethodGet, "/?status=success&msg=hello", nil)
 	rec := httptest.NewRecorder()
+	setFlash(rec, "hello", false)
+	c := flashCookieOf(t, rec)
 
-	handler().ServeHTTP(rec, req)
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req.AddCookie(c)
+	out := httptest.NewRecorder()
+	handler().ServeHTTP(out, req)
 
-	if rec.Code != http.StatusOK {
-		t.Fatalf("status = %d, want %d", rec.Code, http.StatusOK)
+	if out.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d", out.Code, http.StatusOK)
 	}
 
-	body := rec.Body.String()
+	body := out.Body.String()
 	if !strings.Contains(body, "hello") {
 		t.Error("index body missing flash message")
 	}
 	if !strings.Contains(body, "alert-success") {
 		t.Error("index body missing success alert")
 	}
+}
+
+func TestIndexShowsFlashError(t *testing.T) {
+	rec := httptest.NewRecorder()
+	setFlash(rec, "boom", true)
+	c := flashCookieOf(t, rec)
+
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req.AddCookie(c)
+	out := httptest.NewRecorder()
+	handler().ServeHTTP(out, req)
+
+	body := out.Body.String()
+	if !strings.Contains(body, "boom") {
+		t.Error("index body missing flash message")
+	}
+	if !strings.Contains(body, "alert-danger") {
+		t.Error("index body missing error alert")
+	}
+}
+
+func TestFlashShownOnceAndCleared(t *testing.T) {
+	rec := httptest.NewRecorder()
+	setFlash(rec, "once", false)
+	c := flashCookieOf(t, rec)
+
+	// The first request displays the message and clears the cookie.
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req.AddCookie(c)
+	out := httptest.NewRecorder()
+	handler().ServeHTTP(out, req)
+	if !strings.Contains(out.Body.String(), "once") {
+		t.Error("flash message not shown")
+	}
+	if got := cookieNamed(out, flashCookie); got == nil || got.MaxAge != -1 {
+		t.Error("flash cookie not cleared after display")
+	}
+
+	// A second request without the cookie shows nothing.
+	req2 := httptest.NewRequest(http.MethodGet, "/", nil)
+	out2 := httptest.NewRecorder()
+	handler().ServeHTTP(out2, req2)
+	if strings.Contains(out2.Body.String(), "once") {
+		t.Error("flash message shown twice")
+	}
+}
+
+func flashCookieOf(t *testing.T, rec *httptest.ResponseRecorder) *http.Cookie {
+	t.Helper()
+	if c := cookieNamed(rec, flashCookie); c != nil {
+		return c
+	}
+	t.Fatal("no flash cookie set")
+	return nil
+}
+
+func cookieNamed(rec *httptest.ResponseRecorder, name string) *http.Cookie {
+	for _, c := range rec.Result().Cookies() {
+		if c.Name == name {
+			return c
+		}
+	}
+	return nil
 }
 
 func TestParseVersion(t *testing.T) {

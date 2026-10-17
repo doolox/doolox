@@ -6,7 +6,6 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -107,16 +106,17 @@ func handler() http.Handler {
 		w.Write(logo)
 	})
 
-	// Generate the static website and redirect back to the index with a success
-	// or error message.
+	// Generate the static website, store the result as a flash message, and
+	// redirect back to the index.
 	mux.HandleFunc("/generate", func(w http.ResponseWriter, r *http.Request) {
 		generated, err := cms.GenerateSite()
 		if err != nil {
-			http.Redirect(w, r, "/?status=error&msg="+url.QueryEscape(err.Error()), http.StatusSeeOther)
+			setFlash(w, err.Error(), true)
+			http.Redirect(w, r, "/", http.StatusSeeOther)
 			return
 		}
-		msg := fmt.Sprintf("Site generated: %d pages", generated)
-		http.Redirect(w, r, "/?status=success&msg="+url.QueryEscape(msg), http.StatusSeeOther)
+		setFlash(w, fmt.Sprintf("Site generated: %d pages", generated), false)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 	})
 
 	// The admin index page.
@@ -125,11 +125,12 @@ func handler() http.Handler {
 			http.NotFound(w, r)
 			return
 		}
+		msg, isError := getFlash(w, r)
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		data := pageData{
 			Version: appVersion(),
-			Message: r.URL.Query().Get("msg"),
-			Error:   r.URL.Query().Get("status") == "error",
+			Message: msg,
+			Error:   isError,
 		}
 		if err := indexTmpl.ExecuteTemplate(w, "layout.html", data); err != nil {
 			log.Printf("[admin] render index: %v", err)
