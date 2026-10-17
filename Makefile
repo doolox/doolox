@@ -1,10 +1,13 @@
 # Doolox build/development Makefile.
 #
-# The app is pure Go on Linux and Windows. A C compiler is only required on
-# macOS, where the menu-bar icon uses cgo/Objective-C:
-#   macOS -> Xcode CLT (xcode-select --install)
+# The admin interface opens in a native web view (webview/webview_go), which
+# links through cgo on every platform and needs the matching native toolkit:
+#   Linux   -> gcc/g++ plus GTK 3 and WebKitGTK (libwebkit2gtk-4.0-dev)
+#   macOS   -> Xcode CLT (xcode-select --install)
+#   Windows -> MinGW-w64 gcc/g++ (see INSTALL.md)
 #
-# For native Windows builds without make, see build.ps1.
+# The native web view cannot be cross-compiled, so build natively on each OS
+# (see build.ps1 for Windows).
 
 GO      ?= go
 APP     := doolox
@@ -14,7 +17,7 @@ LDFLAGS := -s -w
 GOFLAGS := -trimpath
 
 .PHONY: all build run test vet fmt tidy clean install \
-        build-linux build-windows build-darwin build-deb help
+        build-darwin build-deb help
 
 all: build ## Build the binary (default target)
 
@@ -42,14 +45,6 @@ clean: ## Remove build artifacts
 
 install: ## Install the binary with go install
 	$(GO) install $(PKG)
-
-build-linux: ## Cross-compile for linux/amd64
-	@mkdir -p $(BIN_DIR)
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GO) build $(GOFLAGS) -ldflags "$(LDFLAGS)" -o $(BIN_DIR)/$(APP)-linux-amd64 $(PKG)
-
-build-windows: ## Cross-compile for windows/amd64
-	@mkdir -p $(BIN_DIR)
-	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 $(GO) build $(GOFLAGS) -ldflags "$(LDFLAGS) -H=windowsgui" -o $(BIN_DIR)/$(APP)-windows-amd64.exe $(PKG)
 
 build-darwin: ## Build for macOS (must be run on macOS)
 	@test "$$(go env GOOS)" = "darwin" || { echo "error: build-darwin requires macOS (tray icon uses cgo/Objective-C)"; exit 1; }

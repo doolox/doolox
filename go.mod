@@ -9,6 +9,7 @@ require (
 	github.com/godbus/dbus/v5 v5.1.0
 	github.com/srwiley/oksvg v0.0.0-20221011165216-be6e8873101c
 	github.com/srwiley/rasterx v0.0.0-20220730225603-2ab79fcdd4ef
+	github.com/webview/webview_go v0.0.0-20240831120633-6173450d4dd6
 	gopkg.in/macaron.v1 v1.5.1
 )
 
@@ -25,3 +26,5 @@ require (
 	golang.org/x/text v0.42.0 // indirect
 	gopkg.in/ini.v1 v1.67.3 // indirect
 )
+
+replace github.com/webview/webview_go => ./third_party/webview_go

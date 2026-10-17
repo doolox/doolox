@@ -1,15 +1,17 @@
 # Installing and building Doolox
 
-Doolox is a Go program. A **C compiler is only required on macOS**, where the
-menu-bar icon uses cgo/Objective-C. Linux and Windows builds are pure Go.
+Doolox is a Go program. The admin interface opens in a **native web view**
+(webview/webview_go), which links through cgo on every platform and requires
+the matching native toolkit (GTK/WebKitGTK on Linux, WebView2 on Windows,
+WKWebView on macOS).
 
 ## Prerequisites
 
-| OS        | Requirements                                                       |
-|-----------|---------------------------------------------------------------------|
-| Linux     | Go 1.26+                                                           |
-| macOS     | Go 1.26+ and Xcode Command Line Tools (`xcode-select --install`)   |
-| Windows   | Go 1.26+                                                           |
+| OS        | Requirements                                                                                                        |
+|-----------|----------------------------------------------------------------------------------------------------------------------|
+| Linux     | Go 1.26+, gcc/g++, GTK 3 + WebKitGTK (`sudo apt install build-essential libgtk-3-dev libwebkit2gtk-4.1-dev`)         |
+| macOS     | Go 1.26+ and Xcode Command Line Tools (`xcode-select --install`)                                                     |
+| Windows   | Go 1.26+ and MinGW-w64 gcc/g++ (https://www.mingw-w64.org/)                                                          |
 
 ## Linux
 
@@ -20,7 +22,7 @@ make build          # -> bin/doolox
 
 ## Debian / Ubuntu / Linux Mint (.deb package)
 
-Build the installer (requires `dpkg-deb`):
+Build the installer (requires `dpkg-deb` and the GTK/WebKitGTK build deps above):
 
 ```sh
 make build-deb       # -> dist/doolox_<version>_amd64.deb
@@ -73,7 +75,7 @@ Option A — PowerShell (no `make` required):
 Option B — Git Bash / MSYS2 with `make`:
 
 ```sh
-make build-windows  # -> bin/doolox-windows-amd64.exe
+make build         # -> bin/doolox.exe
 ```
 
 Option C — Inno Setup installer (requires Inno Setup 6+):
@@ -83,20 +85,11 @@ Option C — Inno Setup installer (requires Inno Setup 6+):
 ISCC.exe installer.iss    # -> dist\doolox-setup-<version>.exe
 ```
 
-## Cross-compilation (optional)
+## Cross-compilation
 
-Linux and Windows builds are pure Go, so cross-compiling needs no C toolchain:
-
-```sh
-# on Linux/macOS, build a Windows binary:
-make build-windows
-
-# on macOS/Windows, build a Linux binary:
-make build-linux
-```
-
-macOS cannot be cross-compiled from other OSes (Objective-C + cgo); build it
-on a Mac.
+The native web view links through cgo, so cross-compiling is **not supported**
+— build natively on each OS. macOS additionally cannot be cross-compiled
+(Objective-C + cgo); build it on a Mac.
 
 ## Other Makefile targets
 
@@ -115,7 +108,7 @@ make help       # list all targets
 ## Notes
 
 - `go.mod` declares `go 1.26.5`.
-- `build-windows` / `build.ps1` pass `-H=windowsgui` so the app does not open
+- `build.ps1` passes `-H=windowsgui` so the app does not open
   a console window when launched.
 - Pages are plain files in `content/pages/*.html`. Each page's metadata
   (`title`, `subtitle`, `description`, `type`) lives in an optional
@@ -142,6 +135,9 @@ make help       # list all targets
   `C:\Program Files\Doolox\admin\theme` on Windows) and served by the admin
   server at http://localhost:5555. The HTML templates and logo are embedded
   with `go:embed`; only the CSS/JS/favicon are read from disk at runtime.
+- The native web view uses `webview/webview_go`, vendored under
+  `third_party/webview_go` with a one-line patch to build against WebKitGTK
+  4.1 (Ubuntu 24.04+ / Debian 13); see the `replace` directive in `go.mod`.
 - The app version is configured in `version.iss` — the single source of truth
   used by both the Inno Setup (`installer.iss`) and Debian (`build-deb.sh`)
   packaging. Bump it there and rebuild.

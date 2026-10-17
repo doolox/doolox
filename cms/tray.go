@@ -74,9 +74,7 @@ func runTray(icon TrayIcon, onShutdown func()) {
 				case <-mGenerate.ClickedCh:
 					generateSite()
 				case <-mDashboard.ClickedCh:
-					if err := openBrowser(adminURL); err != nil {
-						log.Printf("open dashboard: %v", err)
-					}
+					go launchDashboard()
 				}
 			}
 		}()
