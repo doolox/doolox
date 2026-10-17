@@ -86,13 +86,13 @@ Source: "assets\*"; DestDir: "{app}\assets"; Flags: ignoreversion recursesubdirs
 ; "onlyifdoesntexist" + "uninsneveruninstall" so reinstalls/upgrades and
 ; uninstalls never clobber or delete the user's site content and database.
 ; ---------------------------------------------------------------------------
-Source: "defaults\content\*"; DestDir: "{%USERPROFILE}\doolox\websites\content"; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist uninsneveruninstall
+Source: "defaults\doolox\content\*"; DestDir: "{%USERPROFILE}\doolox\websites\doolox\content"; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist uninsneveruninstall
 Source: "defaults\config.json"; DestDir: "{%USERPROFILE}\doolox"; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall
 Source: "defaults\doolox.db";  DestDir: "{%USERPROFILE}\doolox"; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall
 
 [Dirs]
 ; Empty docs folder (generated static site) and the reserved templates folder.
-Name: "{%USERPROFILE}\doolox\websites\docs"; Flags: uninsneveruninstall
+Name: "{%USERPROFILE}\doolox\websites\doolox\docs"; Flags: uninsneveruninstall
 Name: "{%USERPROFILE}\doolox\templates"; Flags: uninsneveruninstall
 
 [Icons]

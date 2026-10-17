@@ -38,7 +38,7 @@ cp -R "$ROOT/assets" "$STAGE/opt/doolox/assets"
 
 # 4. Read-only seed data (defaults/) used to populate ~/doolox on first run.
 mkdir -p "$STAGE/opt/doolox/seed"
-cp -R "$ROOT/defaults/content" "$STAGE/opt/doolox/seed/content"
+cp -R "$ROOT/defaults/doolox/content" "$STAGE/opt/doolox/seed/content"
 cp "$ROOT/defaults/config.json" "$STAGE/opt/doolox/seed/config.json"
 cp "$ROOT/defaults/doolox.db" "$STAGE/opt/doolox/seed/doolox.db"
 
