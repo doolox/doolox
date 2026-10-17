@@ -44,7 +44,7 @@ func TestSimpleSeedLayoutsRender(t *testing.T) {
 			if !strings.Contains(html, "/assets/img/favicon.svg") {
 				t.Errorf("rendered %s page is missing the Simple SVG favicon", pageURL)
 			}
-			if !strings.Contains(html, `<img class="me-2" src="/assets/img/favicon.svg" width="32" height="32" alt="">`) {
+			if !strings.Contains(html, `<img class="me-2" src="/assets/img/favicon.svg" width="48" height="48" alt="">`) {
 				t.Errorf("rendered %s page is missing the blue navbar logo", pageURL)
 			}
 			if pageURL == indexPage && !strings.Contains(html, "framework: bootstrap") {
