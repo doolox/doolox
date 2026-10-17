@@ -113,7 +113,40 @@ Name: "{group}\Doolox data"; Filename: "{%USERPROFILE}\doolox"; Comment: "Open t
 [Run]
 ; Optionally launch Doolox when the installer finishes.
 ; "nowait" is required: it is a system-tray app that keeps running until quit.
-Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{%USERPROFILE}\doolox"; Description: "Launch {#MyAppName} now"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#MyAppExeName}"; Parameters: "{code:GetLaunchParameters}"; WorkingDir: "{%USERPROFILE}\doolox"; Description: "Launch {#MyAppName} now"; Flags: nowait postinstall skipifsilent
+
+; This checkbox selects whether the app opens its website at startup. The
+; hidden no-op entry provides the checkbox; GetLaunchParameters passes its
+; value to Doolox, which opens the site after its server is listening.
+Filename: "{sys}\cmd.exe"; Parameters: "/C exit"; Description: "Open the Doolox website"; Flags: runhidden nowait postinstall skipifsilent
 
 ; Open the data folder so it is easy to find after installing.
 Filename: "{%USERPROFILE}\doolox"; Description: "Open the Doolox data folder"; Flags: postinstall shellexec skipifsilent
+
+[Code]
+procedure RunListClickCheck(Sender: TObject);
+begin
+	if WizardForm.RunList.Checked[0] then
+		WizardForm.RunList.ItemEnabled[1] := True
+	else begin
+		WizardForm.RunList.Checked[1] := False;
+		WizardForm.RunList.ItemEnabled[1] := False;
+	end;
+end;
+
+procedure InitializeWizard;
+begin
+	WizardForm.RunList.OnClickCheck := @RunListClickCheck;
+end;
+
+procedure CurPageChanged(CurPageID: Integer);
+begin
+	if CurPageID = wpFinished then
+		WizardForm.RunList.ItemEnabled[1] := WizardForm.RunList.Checked[0];
+end;
+
+function GetLaunchParameters(Param: String): String;
+begin
+	Result := '--open-website=' +
+		IntToStr(Ord(WizardForm.RunList.Checked[1]));
+end;

@@ -41,9 +41,12 @@ func (t TrayIcon) bytes() ([]byte, error) {
 	}
 }
 
-// adminURL is the address of the Doolox admin interface. The admin server
-// listens on :5555 (see the admin package).
-const adminURL = "http://localhost:5555"
+// adminURL and websiteURL are the local addresses of the admin interface and
+// public website, respectively.
+const (
+	adminURL   = "http://localhost:5555"
+	websiteURL = "http://localhost:5000"
+)
 
 // runTray shows the Doolox tray icon and blocks until the tray is quit.
 // onShutdown is called after the tray icon has been removed so the rest of
@@ -60,7 +63,7 @@ func runTray(icon TrayIcon, onShutdown func()) {
 		systray.SetTooltip("Doolox is running")
 
 		systray.SetOnTapped(func() {
-			if err := openBrowser("http://localhost:5000"); err != nil {
+			if err := openBrowser(websiteURL); err != nil {
 				log.Printf("open browser: %v", err)
 			}
 		})

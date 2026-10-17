@@ -3,6 +3,7 @@ package cms
 import (
 	"context"
 	"log"
+	"net"
 	"net/http"
 	"time"
 
@@ -25,7 +26,7 @@ func init() {
 
 // Start runs the Doolox web server and shows the system tray icon. It blocks
 // until the tray is quit, then shuts the server down and returns.
-func Start(trayIcon TrayIcon) {
+func Start(trayIcon TrayIcon, openWebsite bool) {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
 	m.Get("/", pageView)
@@ -38,12 +39,23 @@ func Start(trayIcon TrayIcon) {
 		Handler: m,
 	}
 
-	go func() {
-		log.Printf("listening on %s", server.Addr)
-		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Printf("[Start] server error: %v", err)
+	listener, err := net.Listen("tcp", server.Addr)
+	if err != nil {
+		log.Printf("[Start] server listen error: %v", err)
+	} else {
+		go func() {
+			log.Printf("listening on %s", server.Addr)
+			if err := server.Serve(listener); err != nil && err != http.ErrServerClosed {
+				log.Printf("[Start] server error: %v", err)
+			}
+		}()
+
+		if openWebsite {
+			if err := openBrowser(websiteURL); err != nil {
+				log.Printf("open website: %v", err)
+			}
 		}
-	}()
+	}
 
 	runTray(trayIcon, func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
