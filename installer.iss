@@ -92,12 +92,14 @@ Source: "admin\theme\*"; DestDir: "{app}\admin\theme"; Flags: ignoreversion recu
 ; "onlyifdoesntexist" + "uninsneveruninstall" so reinstalls/upgrades and
 ; uninstalls never clobber or delete the user's site content and config.
 ; ---------------------------------------------------------------------------
-Source: "defaults\doolox\content\*"; DestDir: "{%USERPROFILE}\doolox\websites\doolox\content"; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist uninsneveruninstall
+Source: "defaults\doolox\src\*"; DestDir: "{%USERPROFILE}\doolox\websites\doolox\src"; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist uninsneveruninstall; Check: ShouldSeedSiteSource('doolox')
+Source: "defaults\simple\src\*"; DestDir: "{%USERPROFILE}\doolox\websites\simple\src"; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist uninsneveruninstall; Check: ShouldSeedSiteSource('simple')
 Source: "defaults\config.json"; DestDir: "{%USERPROFILE}\doolox"; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall
 
 [Dirs]
 ; Empty docs folder (generated static site) and the reserved templates folder.
 Name: "{%USERPROFILE}\doolox\websites\doolox\docs"; Flags: uninsneveruninstall
+Name: "{%USERPROFILE}\doolox\websites\simple\docs"; Flags: uninsneveruninstall
 Name: "{%USERPROFILE}\doolox\templates"; Flags: uninsneveruninstall
 
 [Icons]
@@ -124,6 +126,14 @@ Filename: "{sys}\cmd.exe"; Parameters: "/C exit"; Description: "Open the Doolox 
 Filename: "{%USERPROFILE}\doolox"; Description: "Open the Doolox data folder"; Flags: postinstall shellexec skipifsilent
 
 [Code]
+function ShouldSeedSiteSource(SiteName: String): Boolean;
+var
+	LegacyContentDir: String;
+begin
+	LegacyContentDir := ExpandConstant('{%USERPROFILE}\doolox\websites\') + SiteName + '\content';
+	Result := not DirExists(LegacyContentDir);
+end;
+
 procedure RunListClickCheck(Sender: TObject);
 begin
 	if WizardForm.RunList.Checked[0] then

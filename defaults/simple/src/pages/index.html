@@ -1,0 +1,65 @@
+<!--
+title: Simple
+type: page
+-->
+{{define "index"}}
+<section class="bg-body-tertiary border-bottom py-5">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-7">
+        <p class="text-primary fw-semibold text-uppercase">Simple technology</p>
+        <h1 class="display-4 fw-bold">Technology, made simple.</h1>
+        <p class="lead text-body-secondary">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Clear tools and useful ideas for a more connected world.</p>
+        <div class="d-flex flex-wrap gap-2">
+          <a class="btn btn-primary" href="/about">About this site</a>
+          <a class="btn btn-outline-secondary" href="#topics">Explore topics</a>
+        </div>
+      </div>
+      <div class="col-lg-5">
+        <div class="card shadow-sm">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <span>simple.dev</span>
+            <span class="badge text-bg-success">Ready</span>
+          </div>
+          <div class="card-body bg-dark text-light p-4">
+            <p class="text-info mb-3">// A new project</p>
+            <pre class="mb-0"><code><span class="text-success">$</span> simple init
+site: new-project
+framework: bootstrap
+status: ready</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container py-5" id="topics">
+  <div class="row mb-4">
+    <div class="col-lg-8">
+      <h2 class="h3">Built around the basics</h2>
+      <p class="text-body-secondary mb-0">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Choose a topic to start exploring.</p>
+    </div>
+  </div>
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+    <div class="col">
+      <div class="card h-100"><div class="card-body">
+        <h3 class="h5 card-title">Websites</h3>
+        <p class="card-text text-body-secondary">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Build a clear home for your ideas.</p>
+      </div></div>
+    </div>
+    <div class="col">
+      <div class="card h-100"><div class="card-body">
+        <h3 class="h5 card-title">Software</h3>
+        <p class="card-text text-body-secondary">Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Useful tools, without the noise.</p>
+      </div></div>
+    </div>
+    <div class="col">
+      <div class="card h-100"><div class="card-body">
+        <h3 class="h5 card-title">Ideas</h3>
+        <p class="card-text text-body-secondary">Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo.</p>
+      </div></div>
+    </div>
+  </div>
+</section>
+{{end}}

@@ -1,6 +1,6 @@
 {
     "debug": false,
-    "theme": "default",
-    "url": "https://doolox.com",
-    "website": "doolox"
+    "theme": "simple",
+    "url": "https://example.com",
+    "website": "simple"
 }

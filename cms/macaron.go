@@ -2,7 +2,6 @@ package cms
 
 import (
 	"html/template"
-	"path/filepath"
 	"strings"
 	"time"
 
@@ -34,7 +33,7 @@ func initMacaron() *macaron.Macaron {
 	}
 
 	s := macaron.Static(
-		filepath.Join(contentDir(), "theme", "assets"),
+		assetsDir(),
 		macaron.StaticOptions{
 			Prefix:      "assets",
 			SkipLogging: true,

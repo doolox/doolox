@@ -33,11 +33,28 @@ func websitesDir() string { return filepath.Join(dataRoot(), "websites") }
 // generated static site.
 func websiteDir() string { return filepath.Join(websitesDir(), Website()) }
 
+// sourceDir is the current source layout for a website.
+func sourceDir() string { return filepath.Join(websiteDir(), "src") }
+
 // templatesDir is a folder reserved for templates (currently unused).
 func templatesDir() string { return filepath.Join(dataRoot(), "templates") }
 
-// contentDir is the directory macaron loads templates from.
-func contentDir() string { return filepath.Join(websiteDir(), "content") }
+// contentDir is the directory macaron loads templates from. The legacy content
+// layout remains supported for existing installations.
+func contentDir() string {
+	if info, err := os.Stat(sourceDir()); err == nil && info.IsDir() {
+		return sourceDir()
+	}
+	return filepath.Join(websiteDir(), "content")
+}
+
+// assetsDir returns the static asset directory for the active source layout.
+func assetsDir() string {
+	if contentDir() == sourceDir() {
+		return filepath.Join(sourceDir(), "assets")
+	}
+	return filepath.Join(contentDir(), "theme", "assets")
+}
 
 // docsDir is the folder the static website is generated into.
 func docsDir() string { return filepath.Join(websiteDir(), "docs") }

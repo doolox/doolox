@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    {{template "header" .}}
+
+<body class="starter-page-page">
+
+  <header id="header" class="header d-flex align-items-center sticky-top">
+    <div class="container-fluid position-relative d-flex align-items-center justify-content-between">
+
+      <a href="/" class="logo d-flex align-items-center me-auto me-xl-0">
+        <!-- Uncomment the line below if you also wish to use an image logo -->
+        <img src="assets/img/logo.png" alt="Aint City">
+        <!-- <h1 class="sitename">Append</h1><span>.</span> -->
+      </a>
+
+      {{template "main_menu" .}}
+
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- Page Title -->
+    <div class="page-title" data-aos="fade">
+      <div class="heading">
+        <div class="container">
+          <div class="row d-flex justify-content-center text-center">
+            <div class="col-lg-8">
+              <h1>{{ .Page.Title }}</h1>
+              <p class="mb-0">Uber For Websites</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <nav class="breadcrumbs">
+        <div class="container">
+          <ol>
+            <li><a href="/">Home</a></li>
+            <li class="current">{{ .Page.Subtitle }}</li>
+          </ol>
+        </div>
+      </nav>
+    </div><!-- End Page Title -->
+
+    {{ yield }}
+
+    {{template "footer" .}}
+
+</body>
+
+</html>

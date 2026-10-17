@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    {{template "header" .}}
+
+<body class="index-page">
+
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="container-fluid position-relative d-flex align-items-center justify-content-between">
+
+      <a href="/" class="logo d-flex align-items-center me-auto me-xl-0">
+        <!-- Uncomment the line below if you also wish to use an image logo -->
+        <img src="assets/img/logo-white.png?v=9" alt="Doolox" id="logo">
+        <!-- <h1 class="sitename">Append</h1><span>.</span> -->
+      </a>
+
+      {{template "main_menu" .}}
+
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- Hero Section -->
+    <section id="hero" class="hero section dark-background">
+
+      <img src="assets/img/background.jpeg" alt="" data-aos="fade-in">
+
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-10">
+            <h2 data-aos="fade-up" data-aos-delay="100">Build Your Website</h2>
+            <p data-aos="fade-up" data-aos-delay="200">in the way both you and your webmaster deserve</p>
+          </div>
+          <div class="col-lg-5" data-aos="fade-up" data-aos-delay="300">
+            <form action="forms/newsletter.php" method="post" class="php-email-form">
+              <div class="sign-up-form"><input type="email" name="email" placeholder="email@email.com"><input type="submit" value="I'm Interested"></div>
+              <div class="loading">Loading</div>
+              <div class="error-message"></div>
+              <div class="sent-message">Your subscription request has been sent. Thank you!</div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+    </section><!-- /Hero Section -->
+
+    <!-- About Section -->
+    <section id="about" class="about section light-background">
+
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+        <div class="row align-items-xl-center gy-5">
+
+          <div class="col-xl-5 content">
+            <h3>About Doolox</h3>
+            <h2>Uber For Websites</h2>
+            <p>Website building and maintenance through a monthly subscription - we do all: design, hosting, updates, support and everything you need. We push you to finish your website and keep it updated. Simple, reliable and without hidden costs.</p>
+            <a href="/about" class="read-more"><span>Read More</span><i class="bi bi-arrow-right"></i></a>
+          </div>
+
+          <div class="col-xl-7">
+            <div class="row gy-4 icon-boxes">
+
+              <div class="col-md-6" data-aos="fade-up" data-aos-delay="200">
+                <div class="icon-box">
+                  <i class="bi bi-tools"></i>
+                  <h3>Maintenance</h3>
+                  <p>We handle all website maintenance for you, keeping it updated, secure and reliable.</p>
+                </div>
+              </div> <!-- End Icon Box -->
+
+              <div class="col-md-6" data-aos="fade-up" data-aos-delay="300">
+                <div class="icon-box">
+                  <i class="bi bi-envelope-fill"></i>
+                  <h3>Email Addresses</h3>
+                  <p>We set up and manage your email system and addresses, keeping them secure and fully operational.</p>
+                </div>
+              </div> <!-- End Icon Box -->
+
+              <div class="col-md-6" data-aos="fade-up" data-aos-delay="400">
+                <div class="icon-box">
+                  <i class="bi bi-cloud-fill"></i>
+                  <h3>Web Hosting</h3>
+                  <p>We provide reliable web hosting for your site, ensuring fast performance and continuous uptime.</p>
+                </div>
+              </div> <!-- End Icon Box -->
+
+              <div class="col-md-6" data-aos="fade-up" data-aos-delay="500">
+                <div class="icon-box">
+                  <i class="bi bi-google"></i>
+                  <h3>SEO</h3>
+                  <p>We handle search engine optimization for your site, improving visibility and driving more traffic.</p>
+                </div>
+              </div> <!-- End Icon Box -->
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </section><!-- /About Section -->
+
+  </main>
+    
+    {{template "footer" .}}
+
+</body>
+
+</html>
