@@ -9,7 +9,7 @@ import (
 )
 
 func initDb() *gorm.DB {
-	db, err := gorm.Open("sqlite3", filepath.Join(websitesDir(), "doolox.db"))
+	db, err := gorm.Open("sqlite3", filepath.Join(dataRoot(), "doolox.db"))
 
 	if err != nil {
 		log.Printf("[initDb] error: %s", err)

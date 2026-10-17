@@ -24,8 +24,8 @@ func dataRoot() string {
 	return filepath.Join(home, "doolox")
 }
 
-// websitesDir is where the site data lives: content, docs, config.json and
-// doolox.db.
+// websitesDir is where the site content lives: templates (content) and the
+// generated static site (docs). config.json and doolox.db live in dataRoot.
 func websitesDir() string { return filepath.Join(dataRoot(), "websites") }
 
 // templatesDir is a folder reserved for templates (currently unused).
@@ -45,7 +45,7 @@ func logFile() string { return filepath.Join(dataRoot(), "doolox.log") }
 // database file is opened. The content directory is intentionally not created
 // here: it is seeded by the installer/launcher on first run.
 func setupDataDir() {
-	for _, dir := range []string{websitesDir(), docsDir(), templatesDir()} {
+	for _, dir := range []string{dataRoot(), websitesDir(), docsDir(), templatesDir()} {
 		if err := os.MkdirAll(dir, 0755); err != nil {
 			log.Printf("[setup] could not create %s: %v", dir, err)
 		}

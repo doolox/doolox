@@ -13,9 +13,9 @@
 ;          doolox.exe
 ;          assets\...                         (tray icon + assets)
 ;      %USERPROFILE%\doolox\
+;          config.json
+;          doolox.db                         (pre-seeded example pages)
 ;          websites\
-;              config.json
-;              doolox.db                     (pre-seeded example pages)
 ;              content\...                   (templates + theme assets)
 ;              docs\                         (empty; static site is generated here)
 ;          templates\                        (empty; reserved for templates)
@@ -82,13 +82,13 @@ Source: "bin\doolox-windows-amd64.exe"; DestDir: "{app}"; DestName: "{#MyAppExeN
 Source: "assets\*"; DestDir: "{app}\assets"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 ; ---------------------------------------------------------------------------
-; Writable user data -> %USERPROFILE%\doolox\websites.
+; Writable user data -> %USERPROFILE%\doolox.
 ; "onlyifdoesntexist" + "uninsneveruninstall" so reinstalls/upgrades and
 ; uninstalls never clobber or delete the user's site content and database.
 ; ---------------------------------------------------------------------------
 Source: "content\*"; DestDir: "{%USERPROFILE}\doolox\websites\content"; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist uninsneveruninstall
-Source: "config.json"; DestDir: "{%USERPROFILE}\doolox\websites"; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall
-Source: "doolox.db";  DestDir: "{%USERPROFILE}\doolox\websites"; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall
+Source: "config.json"; DestDir: "{%USERPROFILE}\doolox"; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall
+Source: "doolox.db";  DestDir: "{%USERPROFILE}\doolox"; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall
 
 [Dirs]
 ; Empty docs folder (generated static site) and the reserved templates folder.
@@ -97,10 +97,10 @@ Name: "{%USERPROFILE}\doolox\templates"; Flags: uninsneveruninstall
 
 [Icons]
 ; Start Menu entry.
-Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{%USERPROFILE}\doolox\websites"; IconFilename: "{app}\assets\trayicon.ico"; Comment: "Launch Doolox CMS"
+Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{%USERPROFILE}\doolox"; IconFilename: "{app}\assets\trayicon.ico"; Comment: "Launch Doolox CMS"
 
 ; Optional desktop shortcut.
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{%USERPROFILE}\doolox\websites"; IconFilename: "{app}\assets\trayicon.ico"; Comment: "Launch Doolox CMS"; Tasks: desktopicon
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{%USERPROFILE}\doolox"; IconFilename: "{app}\assets\trayicon.ico"; Comment: "Launch Doolox CMS"; Tasks: desktopicon
 
 ; Shortcut that opens the data folder in Explorer.
 Name: "{group}\Doolox data"; Filename: "{%USERPROFILE}\doolox"; Comment: "Open the folder where your website data is stored"
@@ -108,7 +108,7 @@ Name: "{group}\Doolox data"; Filename: "{%USERPROFILE}\doolox"; Comment: "Open t
 [Run]
 ; Optionally launch Doolox when the installer finishes.
 ; "nowait" is required: it is a system-tray app that keeps running until quit.
-Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{%USERPROFILE}\doolox\websites"; Description: "Launch {#MyAppName} now"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{%USERPROFILE}\doolox"; Description: "Launch {#MyAppName} now"; Flags: nowait postinstall skipifsilent
 
 ; Open the data folder so it is easy to find after installing.
 Filename: "{%USERPROFILE}\doolox"; Description: "Open the Doolox data folder"; Flags: postinstall shellexec skipifsilent

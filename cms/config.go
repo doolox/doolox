@@ -37,6 +37,6 @@ func (sc *Config) Load(configFile string) error {
 
 func initConfig() *Config {
 	c := &Config{}
-	c.Load(filepath.Join(websitesDir(), "config.json"))
+	c.Load(filepath.Join(dataRoot(), "config.json"))
 	return c
 }
