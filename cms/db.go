@@ -18,7 +18,7 @@ func initDb() *gorm.DB {
 	db.DB()
 	db.DB().Ping()
 	db.LogMode(conf.Debug)
-	db.AutoMigrate(&Page{})
+	db.AutoMigrate(&Page{}, &KeyValue{})
 
 	return db
 }
