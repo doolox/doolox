@@ -114,6 +114,8 @@ func TestGenerateWritesToWebsiteRoot(t *testing.T) {
 	}
 	for name, body := range map[string]string{
 		"config.json": "{\"name\":\"simple\"}",
+		"README.md":   "site notes",
+		"CNAME":       "example.com",
 		"stale.html":  "old output",
 	} {
 		if err := os.WriteFile(filepath.Join(websiteDir(), name), []byte(body), 0644); err != nil {
@@ -141,8 +143,10 @@ func TestGenerateWritesToWebsiteRoot(t *testing.T) {
 			t.Errorf("generated file %q missing from website root: %v", name, err)
 		}
 	}
-	if _, err := os.Stat(filepath.Join(websiteDir(), "config.json")); err != nil {
-		t.Errorf("per-site config was not preserved: %v", err)
+	for _, name := range []string{"config.json", "README.md", "CNAME"} {
+		if _, err := os.Stat(filepath.Join(websiteDir(), name)); err != nil {
+			t.Errorf("preserved file %q is missing: %v", name, err)
+		}
 	}
 	if _, err := os.Stat(filepath.Join(websiteDir(), "src", "pages", "index.html")); err != nil {
 		t.Errorf("source directory was not preserved: %v", err)

@@ -122,6 +122,10 @@ func clearWebsiteOutput() error {
 		if _, preserve := keep[entry.Name()]; preserve {
 			continue
 		}
+		name := strings.ToLower(entry.Name())
+		if name == "cname" || strings.TrimSuffix(name, filepath.Ext(name)) == "readme" {
+			continue
+		}
 		if err := os.RemoveAll(filepath.Join(websiteDir(), entry.Name())); err != nil {
 			return err
 		}
