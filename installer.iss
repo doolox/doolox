@@ -12,6 +12,7 @@
 ;      C:\Program Files\Doolox\
 ;          doolox.exe
 ;          assets\...                         (tray icon + assets)
+;          admin\theme\...                    (admin web interface)
 ;      %USERPROFILE%\doolox\
 ;          config.json
 ;          doolox.db                         (pre-seeded example pages)
@@ -80,6 +81,12 @@ Source: "bin\doolox-windows-amd64.exe"; DestDir: "{app}"; DestName: "{#MyAppExeN
 ; Project assets (tray icon etc.), copied alongside the binary.
 ; ---------------------------------------------------------------------------
 Source: "assets\*"; DestDir: "{app}\assets"; Flags: ignoreversion recursesubdirs createallsubdirs
+
+; ---------------------------------------------------------------------------
+; Admin web interface (theme templates + static assets served on :5555).
+; The admin server resolves admin\theme\static relative to the executable.
+; ---------------------------------------------------------------------------
+Source: "admin\theme\*"; DestDir: "{app}\admin\theme"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 ; ---------------------------------------------------------------------------
 ; Writable user data -> %USERPROFILE%\doolox.

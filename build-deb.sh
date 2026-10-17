@@ -35,6 +35,7 @@ cp -R "$ROOT/packaging/debian/." "$STAGE/"
 mkdir -p "$STAGE/opt/doolox"
 install -m 0755 "$ROOT/bin/doolox" "$STAGE/opt/doolox/doolox"
 cp -R "$ROOT/assets" "$STAGE/opt/doolox/assets"
+cp -R "$ROOT/admin/theme" "$STAGE/opt/doolox/admin/theme"
 
 # 4. Read-only seed data (defaults/) used to populate ~/doolox on first run.
 mkdir -p "$STAGE/opt/doolox/seed"

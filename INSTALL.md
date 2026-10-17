@@ -123,6 +123,11 @@ make help       # list all targets
 - The tray icon assets (`assets/trayicon.svg`, `assets/trayicon.png`,
   `assets/trayicon.ico`) are embedded into the binary at build time with
   `go:embed`, so no extra runtime files are needed.
+- The admin web interface assets (`admin/theme/`) are shipped next to the
+  binary by both installers (`/opt/doolox/admin/theme` on Linux,
+  `C:\Program Files\Doolox\admin\theme` on Windows) and served by the admin
+  server at http://localhost:5555. The HTML templates and logo are embedded
+  with `go:embed`; only the CSS/JS/favicon are read from disk at runtime.
 - The app version is configured in `version.iss` — the single source of truth
   used by both the Inno Setup (`installer.iss`) and Debian (`build-deb.sh`)
   packaging. Bump it there and rebuild.

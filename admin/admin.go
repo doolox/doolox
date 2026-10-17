@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"doolox/cms"
@@ -16,9 +17,21 @@ import (
 // addr is the address the admin web server listens on.
 const addr = ":5555"
 
-// staticDir is the directory holding the static assets (css, js, images, ...)
-// served under /assets. These files are committed and tracked by git.
-const staticDir = "admin/theme/static"
+// staticDir returns the directory holding the static assets (css, js, images,
+// ...) served under /assets. The Windows installer and the Debian package ship
+// these files next to the executable (admin/theme/static), so for an installed
+// binary the directory is resolved relative to the executable's own location.
+// When running from the source tree (`go run .`), it falls back to the
+// repository-relative path.
+func staticDir() string {
+	if exe, err := os.Executable(); err == nil {
+		dir := filepath.Join(filepath.Dir(exe), "admin", "theme", "static")
+		if _, err := os.Stat(dir); err == nil {
+			return dir
+		}
+	}
+	return filepath.Join("admin", "theme", "static")
+}
 
 // versionFile is the single source of truth for the Doolox version. It lives
 // next to the repository root and is read at runtime relative to the working
@@ -87,7 +100,7 @@ func handler() http.Handler {
 	mux := http.NewServeMux()
 
 	// Static assets (AdminLTE css/js, ...) served from admin/theme/static.
-	mux.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir(staticDir))))
+	mux.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir(staticDir()))))
 
 	// Doolox logo (embedded in the binary).
 	mux.HandleFunc("/logo.svg", func(w http.ResponseWriter, r *http.Request) {
