@@ -1,6 +1,10 @@
 package cms
 
-import "testing"
+import (
+	"os"
+	"path/filepath"
+	"testing"
+)
 
 func TestParseFrontMatter(t *testing.T) {
 	tests := []struct {
@@ -74,5 +78,73 @@ func TestNewPage(t *testing.T) {
 	}
 	if p.Type != "page" {
 		t.Errorf("Type = %q, want %q", p.Type, "page")
+	}
+}
+
+func TestPagesLegacyHomeMapsToIndex(t *testing.T) {
+	dir := t.TempDir()
+	t.Setenv(dooloxHomeEnv, dir)
+
+	prev := conf
+	conf = &Config{Website: "doolox"}
+	defer func() { conf = prev }()
+
+	pagesDir := filepath.Join(dir, "websites", "doolox", "content", "pages")
+	if err := os.MkdirAll(pagesDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(pagesDir, "about.html"), []byte("<!--\ntitle: About\n-->\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	// A legacy home.html (old filename) should resolve as the index page.
+	if err := os.WriteFile(filepath.Join(pagesDir, "home.html"), []byte("<!--\ntitle: Legacy Home\n-->\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	ps := pages()
+	if len(ps) != 2 {
+		t.Fatalf("pages() returned %d pages, want 2: %+v", len(ps), ps)
+	}
+	byURL := map[string]*Page{}
+	for _, p := range ps {
+		byURL[p.URL] = p
+	}
+	if got := byURL["about"].Title; got != "About" {
+		t.Errorf("about title = %q, want %q", got, "About")
+	}
+	idx, ok := byURL[indexPage]
+	if !ok {
+		t.Fatalf("missing %q page: %+v", indexPage, ps)
+	}
+	if idx.Title != "Legacy Home" {
+		t.Errorf("index title = %q, want %q", idx.Title, "Legacy Home")
+	}
+}
+
+func TestPagesIndexWinsOverLegacyHome(t *testing.T) {
+	dir := t.TempDir()
+	t.Setenv(dooloxHomeEnv, dir)
+
+	prev := conf
+	conf = &Config{Website: "doolox"}
+	defer func() { conf = prev }()
+
+	pagesDir := filepath.Join(dir, "websites", "doolox", "content", "pages")
+	if err := os.MkdirAll(pagesDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(pagesDir, "home.html"), []byte("<!--\ntitle: Legacy\n-->\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(pagesDir, "index.html"), []byte("<!--\ntitle: Canonical\n-->\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	ps := pages()
+	if len(ps) != 1 {
+		t.Fatalf("pages() returned %d pages, want 1: %+v", len(ps), ps)
+	}
+	if ps[0].URL != indexPage || ps[0].Title != "Canonical" {
+		t.Errorf("pages()[0] = %+v, want index/Canonical", ps[0])
 	}
 }

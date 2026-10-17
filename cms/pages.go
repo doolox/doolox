@@ -69,13 +69,20 @@ func pages() []*Page {
 		return nil
 	}
 
-	list := []*Page{}
+	// Keyed by URL so that when both a legacy home.html and an index.html
+	// exist, the canonical index.html wins: entries are returned in filename
+	// order and "index.html" sorts after "home.html", so it overwrites it.
+	byURL := map[string]*Page{}
 	for _, entry := range entries {
 		if entry.IsDir() || filepath.Ext(entry.Name()) != ".html" {
 			continue
 		}
 		name := entry.Name()
 		url := strings.TrimSuffix(name, filepath.Ext(name))
+		// A legacy home.html represents the same page as index.html (the root).
+		if url == "home" {
+			url = indexPage
+		}
 
 		data, err := os.ReadFile(filepath.Join(dir, name))
 		if err != nil {
@@ -87,9 +94,13 @@ func pages() []*Page {
 		if info, err := entry.Info(); err == nil {
 			page.Lastmod = info.ModTime()
 		}
-		list = append(list, page)
+		byURL[url] = page
 	}
 
+	list := make([]*Page, 0, len(byURL))
+	for _, p := range byURL {
+		list = append(list, p)
+	}
 	sort.Slice(list, func(i, j int) bool { return list[i].URL < list[j].URL })
 	return list
 }
