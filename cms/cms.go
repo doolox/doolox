@@ -26,13 +26,21 @@ func init() {
 	m = initMacaron()
 }
 
+// routes registers all HTTP routes on the given macaron instance.
+func routes(m *macaron.Macaron) {
+	m.Get("/generate", generateView)
+	m.Get("/doolox.js", dooloxJSView)
+	m.Get("/", homeView)
+	m.Get("/assets/*", assetsView)
+	m.Get("/:seg", segmentView)
+	m.Get("/:seg/:page", nestedView)
+	m.Get("/:seg/assets/*", nestedAssetsView)
+}
+
 // Start runs the Doolox web server and shows the system tray icon. It blocks
 // until the tray is quit, then shuts the server down and returns.
 func Start(trayIcon TrayIcon, openWebsite bool) {
-	m.Get("/", pageView)
-	m.Get("/generate", generateView)
-	m.Get("/doolox.js", dooloxJSView)
-	m.Get("/:page", pageView)
+	routes(m)
 
 	server := &http.Server{
 		Addr:    "127.0.0.1:5000",

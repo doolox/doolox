@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
 
 	macaron "gopkg.in/macaron.v1"
 )
@@ -20,13 +23,37 @@ func layoutFor(url string) string {
 	return "layout"
 }
 
-func pageView(ctx *macaron.Context) {
-	page := ctx.Params(":page")
-	if page == "" {
-		page = indexPage
-	}
+// homeView renders the home page of the default website.
+func homeView(ctx *macaron.Context) {
+	renderPage(ctx, Website(), indexPage)
+}
 
-	p, ok := pageByURL(page)
+// segmentView handles a single path segment: when it names a website other
+// than the default one it renders that website's home page, otherwise the
+// segment is treated as a page of the default website.
+func segmentView(ctx *macaron.Context) {
+	seg := ctx.Params("seg")
+	if isWebsite(seg) && seg != Website() {
+		renderPage(ctx, seg, indexPage)
+		return
+	}
+	renderPage(ctx, Website(), seg)
+}
+
+// nestedView renders a page of the website named by the first path segment.
+func nestedView(ctx *macaron.Context) {
+	seg := ctx.Params("seg")
+	page := ctx.Params("page")
+	if !isWebsite(seg) || seg == Website() {
+		ctx.Status(http.StatusNotFound)
+		return
+	}
+	renderPage(ctx, seg, page)
+}
+
+// renderPage renders the given page of the given website.
+func renderPage(ctx *macaron.Context, site, page string) {
+	p, ok := pageByURL(site, page)
 	if !ok {
 		ctx.Status(http.StatusNotFound)
 		return
@@ -35,9 +62,9 @@ func pageView(ctx *macaron.Context) {
 
 	// Render to a string so the Doolox preview helper can be injected for
 	// live serving only (the static site generator renders without it).
-	html, err := ctx.Render.HTMLString(page, ctx.Data, macaron.HTMLOptions{Layout: layoutFor(page)})
+	html, err := rendererFor(site).HTMLString(page, ctx.Data, macaron.HTMLOptions{Layout: layoutFor(page)})
 	if err != nil {
-		log.Printf("[pageView] render %q: %v", page, err)
+		log.Printf("[renderPage] render %s/%s: %v", site, page, err)
 		ctx.Status(http.StatusInternalServerError)
 		return
 	}
@@ -45,6 +72,36 @@ func pageView(ctx *macaron.Context) {
 	ctx.Resp.Header().Set("Content-Type", "text/html; charset=utf-8")
 	ctx.Resp.WriteHeader(http.StatusOK)
 	ctx.Resp.Write([]byte(injectDooloxJS(html)))
+}
+
+// assetsView serves the static assets of the default website.
+func assetsView(ctx *macaron.Context) {
+	serveAssets(ctx, Website())
+}
+
+// nestedAssetsView serves the static assets of the website named by the first
+// path segment.
+func nestedAssetsView(ctx *macaron.Context) {
+	site := ctx.Params("seg")
+	if !isWebsite(site) {
+		ctx.Status(http.StatusNotFound)
+		return
+	}
+	serveAssets(ctx, site)
+}
+
+// serveAssets serves a file from the given website's assets directory.
+func serveAssets(ctx *macaron.Context, site string) {
+	dir := filepath.Clean(assetsDir(site))
+	name := filepath.Join(dir, filepath.FromSlash(ctx.Params("*")))
+
+	// Keep the request inside the assets directory.
+	if name != dir && !strings.HasPrefix(name, dir+string(os.PathSeparator)) {
+		ctx.Status(http.StatusNotFound)
+		return
+	}
+
+	http.ServeFile(ctx.Resp, ctx.Req.Request, name)
 }
 
 func generateView(ctx *macaron.Context) {

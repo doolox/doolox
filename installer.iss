@@ -92,8 +92,7 @@ Source: "admin\theme\*"; DestDir: "{app}\admin\theme"; Flags: ignoreversion recu
 ; "onlyifdoesntexist" + "uninsneveruninstall" so reinstalls/upgrades and
 ; uninstalls never clobber or delete the user's site content and config.
 ; ---------------------------------------------------------------------------
-Source: "defaults\append\src\*"; DestDir: "{%USERPROFILE}\doolox\websites\append\src"; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist uninsneveruninstall; Check: ShouldSeedSiteSource('append')
-Source: "defaults\simple\src\*"; DestDir: "{%USERPROFILE}\doolox\websites\simple\src"; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist uninsneveruninstall; Check: ShouldSeedSiteSource('simple')
+Source: "defaults\append\*"; DestDir: "{%USERPROFILE}\doolox\websites\append"; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist uninsneveruninstall; Check: ShouldSeedSiteSource('append')
 Source: "defaults\config.json"; DestDir: "{%USERPROFILE}\doolox"; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall
 
 [Dirs]

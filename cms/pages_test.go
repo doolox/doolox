@@ -84,14 +84,11 @@ func TestNewPage(t *testing.T) {
 func TestGenerateWritesToWebsiteRoot(t *testing.T) {
 	t.Setenv(dooloxHomeEnv, t.TempDir())
 	previousConf := conf
-	previousOpts := renderOpts
 	conf = &Config{Website: "simple", URL: "https://example.com"}
-	defer func() {
-		conf = previousConf
-		renderOpts = previousOpts
-	}()
+	defer func() { conf = previousConf }()
 
-	source := sourceDir()
+	site := "simple"
+	source := sourceDir(site)
 	pagesPath := filepath.Join(source, "pages")
 	if err := os.MkdirAll(pagesPath, 0755); err != nil {
 		t.Fatal(err)
@@ -109,7 +106,7 @@ func TestGenerateWritesToWebsiteRoot(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(assets, "site.css"), []byte("body { color: red; }"), 0644); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.MkdirAll(websiteDir(), 0755); err != nil {
+	if err := os.MkdirAll(websiteDir(site), 0755); err != nil {
 		t.Fatal(err)
 	}
 	for name, body := range map[string]string{
@@ -118,52 +115,55 @@ func TestGenerateWritesToWebsiteRoot(t *testing.T) {
 		"CNAME":       "example.com",
 		"stale.html":  "old output",
 	} {
-		if err := os.WriteFile(filepath.Join(websiteDir(), name), []byte(body), 0644); err != nil {
+		if err := os.WriteFile(filepath.Join(websiteDir(site), name), []byte(body), 0644); err != nil {
 			t.Fatal(err)
 		}
 	}
-	gitDir := filepath.Join(websiteDir(), ".git")
+	gitDir := filepath.Join(websiteDir(site), ".git")
 	if err := os.MkdirAll(gitDir, 0755); err != nil {
 		t.Fatal(err)
 	}
 	if err := os.WriteFile(filepath.Join(gitDir, "config"), []byte("git config"), 0644); err != nil {
 		t.Fatal(err)
 	}
-	staleAssets := filepath.Join(websiteDir(), "assets")
+	staleAssets := filepath.Join(websiteDir(site), "assets")
 	if err := os.MkdirAll(staleAssets, 0755); err != nil {
 		t.Fatal(err)
 	}
 	if err := os.WriteFile(filepath.Join(staleAssets, "old.css"), []byte("old asset"), 0644); err != nil {
 		t.Fatal(err)
 	}
-	renderOpts.Directory = source
 
-	generated, err := generate(newRenderer())
+	generated, err := generate()
 	if err != nil {
 		t.Fatalf("generate() error = %v", err)
 	}
 	if generated != 1 {
 		t.Fatalf("generate() wrote %d pages, want 1", generated)
 	}
-	for _, name := range []string{"index.html", "sitemap.xml", filepath.Join("assets", "css", "site.css")} {
-		if _, err := os.Stat(filepath.Join(websiteDir(), name)); err != nil {
+	for _, name := range []string{"index.html", filepath.Join("assets", "css", "site.css")} {
+		if _, err := os.Stat(filepath.Join(websiteDir(site), name)); err != nil {
 			t.Errorf("generated file %q missing from website root: %v", name, err)
 		}
 	}
+	// The combined sitemap lives one level up, at the root of the websites dir.
+	if _, err := os.Stat(filepath.Join(websitesDir(), "sitemap.xml")); err != nil {
+		t.Errorf("combined sitemap missing from websites root: %v", err)
+	}
 	for _, name := range []string{"config.json", "README.md", "CNAME", filepath.Join(".git", "config")} {
-		if _, err := os.Stat(filepath.Join(websiteDir(), name)); err != nil {
+		if _, err := os.Stat(filepath.Join(websiteDir(site), name)); err != nil {
 			t.Errorf("preserved file %q is missing: %v", name, err)
 		}
 	}
-	if _, err := os.Stat(filepath.Join(websiteDir(), "src", "pages", "index.html")); err != nil {
+	if _, err := os.Stat(filepath.Join(websiteDir(site), "src", "pages", "index.html")); err != nil {
 		t.Errorf("source directory was not preserved: %v", err)
 	}
 	for _, name := range []string{"stale.html", filepath.Join("assets", "old.css")} {
-		if _, err := os.Stat(filepath.Join(websiteDir(), name)); !os.IsNotExist(err) {
+		if _, err := os.Stat(filepath.Join(websiteDir(site), name)); !os.IsNotExist(err) {
 			t.Errorf("stale output %q still exists, stat error = %v", name, err)
 		}
 	}
-	if _, err := os.Stat(filepath.Join(websiteDir(), "docs")); !os.IsNotExist(err) {
+	if _, err := os.Stat(filepath.Join(websiteDir(site), "docs")); !os.IsNotExist(err) {
 		t.Errorf("docs directory exists after generation, stat error = %v", err)
 	}
 }
@@ -188,7 +188,7 @@ func TestPagesLegacyHomeMapsToIndex(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	ps := pages()
+	ps := pages("doolox")
 	if len(ps) != 2 {
 		t.Fatalf("pages() returned %d pages, want 2: %+v", len(ps), ps)
 	}
@@ -227,7 +227,7 @@ func TestPagesIndexWinsOverLegacyHome(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	ps := pages()
+	ps := pages("doolox")
 	if len(ps) != 1 {
 		t.Fatalf("pages() returned %d pages, want 1: %+v", len(ps), ps)
 	}

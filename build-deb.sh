@@ -39,9 +39,8 @@ mkdir -p "$STAGE/opt/doolox/admin"
 cp -R "$ROOT/admin/theme" "$STAGE/opt/doolox/admin/theme"
 
 # 4. Read-only seed data (defaults/) used to populate ~/doolox on first run.
-mkdir -p "$STAGE/opt/doolox/seed/append" "$STAGE/opt/doolox/seed/simple"
-cp -R "$ROOT/defaults/append/src" "$STAGE/opt/doolox/seed/append/"
-cp -R "$ROOT/defaults/simple/src" "$STAGE/opt/doolox/seed/simple/"
+mkdir -p "$STAGE/opt/doolox/seed/append"
+cp -R "$ROOT/defaults/append/." "$STAGE/opt/doolox/seed/append/"
 cp "$ROOT/defaults/config.json" "$STAGE/opt/doolox/seed/config.json"
 
 # 5. Icons -> hicolor theme + pixmaps fallback (the .desktop uses Icon=doolox).

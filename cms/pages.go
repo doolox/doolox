@@ -10,7 +10,7 @@ import (
 
 // pagesDir is the directory holding the website pages. Each .html file in it
 // is one page; the page URL is the file name without the extension.
-func pagesDir() string { return filepath.Join(contentDir(), "pages") }
+func pagesDir(site string) string { return filepath.Join(contentDir(site), "pages") }
 
 // parseFrontMatter extracts the key/value pairs from the optional leading
 // <!-- ... --> comment of a page file. It returns nil when the file has no
@@ -61,8 +61,8 @@ func newPage(url string, data []byte) *Page {
 }
 
 // pages returns every page discovered in the pages directory, ordered by URL.
-func pages() []*Page {
-	dir := pagesDir()
+func pages(site string) []*Page {
+	dir := pagesDir(site)
 	entries, err := os.ReadDir(dir)
 	if err != nil {
 		log.Printf("[pages] read %s: %v", dir, err)
@@ -107,8 +107,8 @@ func pages() []*Page {
 
 // pageByURL returns the page with the given URL, or false when no such page
 // exists.
-func pageByURL(url string) (*Page, bool) {
-	for _, p := range pages() {
+func pageByURL(site, url string) (*Page, bool) {
+	for _, p := range pages(site) {
 		if p.URL == url {
 			return p, true
 		}

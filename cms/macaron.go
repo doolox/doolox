@@ -3,7 +3,7 @@ package cms
 import (
 	"html/template"
 	"strings"
-	"time"
+	"sync"
 
 	"github.com/go-macaron/cache"
 	macaron "gopkg.in/macaron.v1"
@@ -11,9 +11,13 @@ import (
 	_ "github.com/go-macaron/session/redis"
 )
 
-// renderOpts holds the template configuration shared by the HTTP middleware
-// and the system tray menu.
+// renderOpts holds the template configuration shared by the HTTP middleware,
+// the system tray menu and the per-website renderers.
 var renderOpts macaron.RenderOptions
+
+// siteRenderers caches a compiled renderer per website directory, so each
+// website's templates are parsed only once.
+var siteRenderers sync.Map
 
 func initMacaron() *macaron.Macaron {
 	m := macaron.Classic()
@@ -28,39 +32,45 @@ func initMacaron() *macaron.Macaron {
 
 			},
 		}},
-		Directory:  contentDir(),
+		Directory:  contentDir(Website()),
 		Extensions: []string{".tmpl", ".html"},
 	}
 
-	s := macaron.Static(
-		assetsDir(),
-		macaron.StaticOptions{
-			Prefix:      "assets",
-			SkipLogging: true,
-			IndexFile:   "index.html",
-			// Expires defines which user-defined function to use for producing a HTTP Expires Header. Default is nil.
-			// https://developers.google.com/speed/docs/insights/LeverageBrowserCaching
-			Expires: func() string {
-				return time.Now().Add(24 * 60 * time.Minute).UTC().Format("Mon, 02 Jan 2006 15:04:05 GMT")
-			},
-		})
-
 	m.Use(macaron.Renderer(renderOpts))
-	m.Use(s)
 	m.Use(cache.Cacher())
 
 	return m
 }
 
-// newRenderer returns a macaron.Render that can render templates outside of an
-// HTTP request. It is used by the system tray menu to generate the site.
-func newRenderer() macaron.Render {
+// rendererWithOpts builds a macaron.Render for the given options.
+func rendererWithOpts(opts *macaron.RenderOptions) macaron.Render {
 	ts := macaron.NewTemplateSet()
-	ts.Set(macaron.DEFAULT_TPL_SET_NAME, &renderOpts)
+	ts.Set(macaron.DEFAULT_TPL_SET_NAME, opts)
 
 	return &macaron.TplRender{
 		TemplateSet:     ts,
-		Opt:             &renderOpts,
-		CompiledCharset: macaron.PrepareCharset(renderOpts.Charset),
+		Opt:             opts,
+		CompiledCharset: macaron.PrepareCharset(opts.Charset),
 	}
+}
+
+// newRenderer returns a renderer that uses the current global render options.
+// It is used by tests to render a template directory directly.
+func newRenderer() macaron.Render {
+	return rendererWithOpts(&renderOpts)
+}
+
+// rendererFor returns a renderer for the named website. Renderers are cached
+// by their template directory so each website's templates are parsed once.
+func rendererFor(site string) macaron.Render {
+	dir := contentDir(site)
+	if r, ok := siteRenderers.Load(dir); ok {
+		return r.(macaron.Render)
+	}
+
+	opts := renderOpts
+	opts.Directory = dir
+	r := rendererWithOpts(&opts)
+	siteRenderers.Store(dir, r)
+	return r
 }

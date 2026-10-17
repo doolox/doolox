@@ -22,7 +22,7 @@ func generateSite() {
 // shows a system notification, and returns the number of generated pages or an
 // error.
 func GenerateSite() (int, error) {
-	generated, err := generate(newRenderer())
+	generated, err := generate()
 	if err != nil {
 		log.Printf("[generate] error: %v", err)
 		notify("Doolox", fmt.Sprintf("Site generation failed: %v", err))
@@ -34,45 +34,74 @@ func GenerateSite() (int, error) {
 	return generated, nil
 }
 
-// generate renders every page stored in the database to a static HTML file
-// in the website root and returns how many files were written plus the first error
-// encountered, if any. The sitemap of the generated pages is written as well.
-//
-// It does not crawl anything; pages are read from the database. Before writing
-// output, generated files are cleared while source and per-site config remain.
-func generate(render macaron.Render) (int, error) {
-	pages := pages()
+// sitePage pairs a page with the website it belongs to, for the combined
+// sitemap.
+type sitePage struct {
+	site string
+	page *Page
+}
 
-	type renderedPage struct {
-		page *Page
-		html []byte
-	}
-	rendered := make([]renderedPage, 0, len(pages))
+// generate renders every website to a static HTML file inside its own folder
+// and writes a single combined sitemap.xml at the root of the websites
+// directory. It returns how many files were written plus the first error
+// encountered, if any.
+//
+// It does not crawl anything; pages are read from disk. Before writing output,
+// each website's generated files are cleared while its source and per-site
+// config remain.
+func generate() (int, error) {
+	total := 0
+	allPages := make([]sitePage, 0)
 	var firstErr error
 
-	for _, page := range pages {
-		html, err := render.HTMLString(
+	for _, site := range websites() {
+		generated, sitePages, err := generateWebsite(site)
+		total += generated
+		for _, p := range sitePages {
+			allPages = append(allPages, sitePage{site: site, page: p})
+		}
+		if err != nil && firstErr == nil {
+			firstErr = err
+		}
+	}
+
+	if err := generateSitemap(allPages); err != nil {
+		log.Printf("[generate] error while writing the sitemap: %v", err)
+		if firstErr == nil {
+			firstErr = err
+		}
+	}
+
+	return total, firstErr
+}
+
+// generateWebsite renders the pages of a single website to static HTML files
+// inside its folder and copies its assets, returning the generated pages.
+func generateWebsite(site string) (int, []*Page, error) {
+	renderer := rendererFor(site)
+	sitePages := pages(site)
+
+	if err := clearSiteOutput(site); err != nil {
+		return 0, nil, err
+	}
+
+	generated := make([]*Page, 0, len(sitePages))
+	var firstErr error
+	for _, page := range sitePages {
+		html, err := renderer.HTMLString(
 			page.URL,
 			map[string]interface{}{"Page": page},
 			macaron.HTMLOptions{Layout: layoutFor(page.URL)})
 		if err != nil {
-			log.Printf("[generate] error while rendering %q: %v", page.URL, err)
+			log.Printf("[generate] error while rendering %s/%s: %v", site, page.URL, err)
 			if firstErr == nil {
 				firstErr = err
 			}
 			continue
 		}
-		rendered = append(rendered, renderedPage{page: page, html: []byte(html)})
-	}
 
-	if err := clearWebsiteOutput(); err != nil {
-		return 0, err
-	}
-
-	generated := make([]*Page, 0, len(rendered))
-	for _, page := range rendered {
-		path := filepath.Join(websiteDir(), page.page.URL+".html")
-		if err := os.WriteFile(path, page.html, 0644); err != nil {
+		path := filepath.Join(websiteDir(site), page.URL+".html")
+		if err := os.WriteFile(path, []byte(html), 0644); err != nil {
 			log.Printf("[generate] error while writing %q: %v", path, err)
 			if firstErr == nil {
 				firstErr = err
@@ -81,27 +110,22 @@ func generate(render macaron.Render) (int, error) {
 		}
 
 		log.Printf("[generate] wrote %q", path)
-		generated = append(generated, page.page)
+		generated = append(generated, page)
 	}
 
-	if err := generateSitemap(generated); err != nil {
-		log.Printf("[generate] error while writing the sitemap: %v", err)
-		if firstErr == nil {
-			firstErr = err
-		}
-	}
-	if err := copyWebsiteAssets(); err != nil {
+	if err := copySiteAssets(site); err != nil {
 		log.Printf("[generate] error while copying website assets: %v", err)
 		if firstErr == nil {
 			firstErr = err
 		}
 	}
 
-	return len(generated), firstErr
+	return len(generated), generated, firstErr
 }
 
-func clearWebsiteOutput() error {
-	if err := os.MkdirAll(websiteDir(), 0755); err != nil {
+func clearSiteOutput(site string) error {
+	dir := websiteDir(site)
+	if err := os.MkdirAll(dir, 0755); err != nil {
 		return err
 	}
 
@@ -110,12 +134,17 @@ func clearWebsiteOutput() error {
 		"config.json": {},
 		".git":        {},
 	}
-	activeSource := contentDir()
-	if filepath.Dir(activeSource) == websiteDir() {
+	activeSource := contentDir(site)
+	if filepath.Dir(activeSource) == dir {
 		keep[filepath.Base(activeSource)] = struct{}{}
 	}
+	// Nested websites are subfolders of the default website and must survive
+	// the default website's output clearing.
+	for _, n := range websites() {
+		keep[n] = struct{}{}
+	}
 
-	entries, err := os.ReadDir(websiteDir())
+	entries, err := os.ReadDir(dir)
 	if err != nil {
 		return err
 	}
@@ -127,22 +156,22 @@ func clearWebsiteOutput() error {
 		if name == "cname" || strings.TrimSuffix(name, filepath.Ext(name)) == "readme" {
 			continue
 		}
-		if err := os.RemoveAll(filepath.Join(websiteDir(), entry.Name())); err != nil {
+		if err := os.RemoveAll(filepath.Join(dir, entry.Name())); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func copyWebsiteAssets() error {
-	source := assetsDir()
+func copySiteAssets(site string) error {
+	source := assetsDir(site)
 	if _, err := os.Stat(source); os.IsNotExist(err) {
 		return nil
 	} else if err != nil {
 		return err
 	}
 
-	destination := filepath.Join(websiteDir(), "assets")
+	destination := filepath.Join(websiteDir(site), "assets")
 	return filepath.WalkDir(source, func(path string, entry os.DirEntry, walkErr error) error {
 		if walkErr != nil {
 			return walkErr
@@ -200,8 +229,9 @@ type sitemapURL struct {
 	Priority string `xml:"priority"`
 }
 
-// generateSitemap writes sitemap.xml in the website root.
-func generateSitemap(pages []*Page) error {
+// generateSitemap writes a single combined sitemap.xml at the root of the
+// websites directory, listing every page of every website under its own path.
+func generateSitemap(sitePages []sitePage) error {
 	site := strings.TrimSuffix(conf.URL, "/")
 
 	if site == "" {
@@ -213,18 +243,27 @@ func generateSitemap(pages []*Page) error {
 		XHTML: "http://www.w3.org/1999/xhtml",
 	}
 
-	for _, page := range pages {
-		loc := site + "/" + page.URL
+	for _, sp := range sitePages {
 		priority := "0.8000"
-
-		if page.URL == indexPage {
-			loc = site + "/"
+		if sp.page.URL == indexPage {
 			priority = "1.0000"
+		}
+
+		// The default website is served at the root of the URL; every other
+		// website is served under its own subpath.
+		var loc string
+		if sp.site == Website() {
+			loc = site + "/"
+		} else {
+			loc = site + "/" + sp.site + "/"
+		}
+		if sp.page.URL != indexPage {
+			loc += sp.page.URL
 		}
 
 		sm.URLs = append(sm.URLs, sitemapURL{
 			Loc:      loc,
-			Lastmod:  page.Lastmod.UTC().Format("2006-01-02T15:04:05-07:00"),
+			Lastmod:  sp.page.Lastmod.UTC().Format("2006-01-02T15:04:05-07:00"),
 			Priority: priority,
 		})
 	}
@@ -234,7 +273,7 @@ func generateSitemap(pages []*Page) error {
 		return err
 	}
 
-	path := filepath.Join(websiteDir(), "sitemap.xml")
+	path := filepath.Join(websitesDir(), "sitemap.xml")
 	out := xml.Header + string(body) + "\n"
 
 	if err := os.WriteFile(path, []byte(out), 0644); err != nil {

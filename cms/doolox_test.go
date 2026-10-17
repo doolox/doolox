@@ -52,9 +52,7 @@ func TestDooloxJSServedAndInjected(t *testing.T) {
 	mk("theme/header.html", "{{define \"header\"}}<title>{{.Page.Title}}</title>{{end}}")
 
 	m = initMacaron()
-	m.Get("/", pageView)
-	m.Get("/doolox.js", dooloxJSView)
-	m.Get("/:page", pageView)
+	routes(m)
 
 	// The live page must include the helper script tag.
 	rec := httptest.NewRecorder()

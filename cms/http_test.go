@@ -17,7 +17,7 @@ func TestSimpleSeedLayoutsRender(t *testing.T) {
 	if !ok {
 		t.Fatal("could not locate test source")
 	}
-	content := filepath.Join(filepath.Dir(sourceFile), "..", "defaults", "simple", "src")
+	content := filepath.Join(filepath.Dir(sourceFile), "..", "defaults", "append", "cms", "src")
 
 	previousOpts := renderOpts
 	renderOpts.Directory = content
@@ -35,16 +35,16 @@ func TestSimpleSeedLayoutsRender(t *testing.T) {
 			if err != nil {
 				t.Fatalf("render %s layout: %v", layoutFor(pageURL), err)
 			}
-			if !strings.Contains(html, "/assets/vendor/bootstrap/css/bootstrap.min.css") {
+			if !strings.Contains(html, "assets/vendor/bootstrap/css/bootstrap.min.css") {
 				t.Errorf("rendered %s page is missing Bootstrap CSS", pageURL)
 			}
-			if !strings.Contains(html, "/assets/img/favicon.ico") {
+			if !strings.Contains(html, "assets/img/favicon.ico") {
 				t.Errorf("rendered %s page is missing the Doolox favicon", pageURL)
 			}
-			if !strings.Contains(html, "/assets/img/favicon.svg") {
+			if !strings.Contains(html, "assets/img/favicon.svg") {
 				t.Errorf("rendered %s page is missing the Simple SVG favicon", pageURL)
 			}
-			if !strings.Contains(html, `<img class="me-2" src="/assets/img/favicon.svg" width="48" height="48" alt="">`) {
+			if !strings.Contains(html, `<img class="me-2" src="assets/img/favicon.svg" width="48" height="48" alt="">`) {
 				t.Errorf("rendered %s page is missing the blue navbar logo", pageURL)
 			}
 			if pageURL == indexPage && !strings.Contains(html, "framework: bootstrap") {
@@ -77,7 +77,7 @@ func TestAppendSeedLayoutsRender(t *testing.T) {
 			if err != nil {
 				t.Fatalf("render %s layout: %v", layoutFor(pageURL), err)
 			}
-			if !strings.Contains(html, "/assets/img/favicon.ico") {
+			if !strings.Contains(html, "assets/img/favicon.ico") {
 				t.Errorf("rendered %s page is missing the Doolox favicon", pageURL)
 			}
 			if !strings.Contains(html, "assets/vendor/bootstrap/css/bootstrap.min.css") {
@@ -93,28 +93,29 @@ func TestContentDirPrefersSourceAndFallsBackToLegacy(t *testing.T) {
 	conf = &Config{Website: "simple"}
 	defer func() { conf = previousConf }()
 
-	source := sourceDir()
+	site := "simple"
+	source := sourceDir(site)
 	if err := os.MkdirAll(filepath.Join(source, "assets"), 0755); err != nil {
 		t.Fatal(err)
 	}
-	if got := contentDir(); got != source {
+	if got := contentDir(site); got != source {
 		t.Fatalf("contentDir() = %q, want source directory %q", got, source)
 	}
-	if got, want := assetsDir(), filepath.Join(source, "assets"); got != want {
+	if got, want := assetsDir(site), filepath.Join(source, "assets"); got != want {
 		t.Fatalf("assetsDir() = %q, want %q", got, want)
 	}
 
 	if err := os.RemoveAll(source); err != nil {
 		t.Fatal(err)
 	}
-	legacy := filepath.Join(websiteDir(), "content")
+	legacy := filepath.Join(websiteDir(site), "content")
 	if err := os.MkdirAll(legacy, 0755); err != nil {
 		t.Fatal(err)
 	}
-	if got := contentDir(); got != legacy {
+	if got := contentDir(site); got != legacy {
 		t.Fatalf("contentDir() = %q, want legacy directory %q", got, legacy)
 	}
-	if got, want := assetsDir(), filepath.Join(legacy, "theme", "assets"); got != want {
+	if got, want := assetsDir(site), filepath.Join(legacy, "theme", "assets"); got != want {
 		t.Fatalf("assetsDir() = %q, want legacy assets directory %q", got, want)
 	}
 }
@@ -151,8 +152,7 @@ func TestHTTPRoutes(t *testing.T) {
 	mk("theme/header.html", "{{define \"header\"}}<title>{{.Page.Title}}</title>{{end}}")
 
 	m = initMacaron()
-	m.Get("/", pageView)
-	m.Get("/:page", pageView)
+	routes(m)
 
 	get := func(path string) *httptest.ResponseRecorder {
 		t.Helper()
@@ -211,8 +211,7 @@ func TestHTTPRouteLegacyHome(t *testing.T) {
 	mk("layout_home.html", "<html><head><title>HOME</title></head><body>HOME</body></html>")
 
 	m = initMacaron()
-	m.Get("/", pageView)
-	m.Get("/:page", pageView)
+	routes(m)
 
 	rec := httptest.NewRecorder()
 	m.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/", nil))
@@ -221,5 +220,76 @@ func TestHTTPRouteLegacyHome(t *testing.T) {
 	}
 	if !strings.Contains(rec.Body.String(), "HOME") {
 		t.Errorf("GET / body missing home content: %q", rec.Body.String())
+	}
+}
+
+func TestMultipleWebsitesRoutingAndCombinedSitemap(t *testing.T) {
+	dir := t.TempDir()
+	t.Setenv(dooloxHomeEnv, dir)
+
+	prevConf := conf
+	prevM := m
+	conf = &Config{Website: "simple", URL: "https://example.com"}
+	defer func() {
+		conf = prevConf
+		m = prevM
+	}()
+
+	mkSite := func(path, title, homeBody string) {
+		t.Helper()
+		pages := filepath.Join(path, "src", "pages")
+		if err := os.MkdirAll(pages, 0755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(filepath.Join(pages, "index.html"), []byte("<!--\ntitle: "+title+"\n-->\n{{define \"index\"}}"+homeBody+"{{end}}"), 0644); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(filepath.Join(path, "src", "layout_home.html"), []byte("<html><body>{{yield}}</body></html>"), 0644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	// Default website, served at the root.
+	mkSite(filepath.Join(dir, "websites", "simple"), "simple", "SIMPLE HOME")
+	// Nested website, a subfolder of the default website.
+	mkSite(filepath.Join(dir, "websites", "simple", "append"), "append", "APPEND HOME")
+
+	m = initMacaron()
+	routes(m)
+
+	get := func(path string) *httptest.ResponseRecorder {
+		t.Helper()
+		rec := httptest.NewRecorder()
+		m.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, path, nil))
+		return rec
+	}
+
+	// The default website is served at the root.
+	if rec := get("/"); rec.Code != http.StatusOK || !strings.Contains(rec.Body.String(), "SIMPLE HOME") {
+		t.Errorf("GET / = %d, want 200 with SIMPLE HOME (body=%q)", rec.Code, rec.Body.String())
+	}
+
+	// Nested websites are served under their own subpath.
+	if rec := get("/append/"); rec.Code != http.StatusOK || !strings.Contains(rec.Body.String(), "APPEND HOME") {
+		t.Errorf("GET /append/ = %d, want 200 with APPEND HOME (body=%q)", rec.Code, rec.Body.String())
+	}
+
+	// An unknown segment is a 404.
+	if rec := get("/nope/"); rec.Code != http.StatusNotFound {
+		t.Errorf("GET /nope/ = %d, want 404", rec.Code)
+	}
+
+	if _, err := generate(); err != nil {
+		t.Fatalf("generate() error = %v", err)
+	}
+	data, err := os.ReadFile(filepath.Join(dir, "websites", "sitemap.xml"))
+	if err != nil {
+		t.Fatalf("combined sitemap missing: %v", err)
+	}
+	body := string(data)
+	if !strings.Contains(body, "<loc>https://example.com/</loc>") {
+		t.Errorf("sitemap missing default website root link: %s", body)
+	}
+	if !strings.Contains(body, "<loc>https://example.com/append/</loc>") {
+		t.Errorf("sitemap missing /append/ link: %s", body)
 	}
 }
