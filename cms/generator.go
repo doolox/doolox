@@ -3,6 +3,7 @@ package cms
 import (
 	"encoding/xml"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -37,13 +38,16 @@ func GenerateSite() (int, error) {
 // in the website root and returns how many files were written plus the first error
 // encountered, if any. The sitemap of the generated pages is written as well.
 //
-// It does not crawl anything, the pages are read from the database. Files that
-// already exist are overridden, folders are never created or copied, only
-// plain HTML files are written.
+// It does not crawl anything; pages are read from the database. Before writing
+// output, generated files are cleared while source and per-site config remain.
 func generate(render macaron.Render) (int, error) {
 	pages := pages()
 
-	generated := []*Page{}
+	type renderedPage struct {
+		page *Page
+		html []byte
+	}
+	rendered := make([]renderedPage, 0, len(pages))
 	var firstErr error
 
 	for _, page := range pages {
@@ -58,10 +62,17 @@ func generate(render macaron.Render) (int, error) {
 			}
 			continue
 		}
+		rendered = append(rendered, renderedPage{page: page, html: []byte(html)})
+	}
 
-		path := filepath.Join(websiteDir(), page.URL+".html")
+	if err := clearWebsiteOutput(); err != nil {
+		return 0, err
+	}
 
-		if err := os.WriteFile(path, []byte(html), 0644); err != nil {
+	generated := make([]*Page, 0, len(rendered))
+	for _, page := range rendered {
+		path := filepath.Join(websiteDir(), page.page.URL+".html")
+		if err := os.WriteFile(path, page.html, 0644); err != nil {
 			log.Printf("[generate] error while writing %q: %v", path, err)
 			if firstErr == nil {
 				firstErr = err
@@ -70,7 +81,7 @@ func generate(render macaron.Render) (int, error) {
 		}
 
 		log.Printf("[generate] wrote %q", path)
-		generated = append(generated, page)
+		generated = append(generated, page.page)
 	}
 
 	if err := generateSitemap(generated); err != nil {
@@ -79,8 +90,94 @@ func generate(render macaron.Render) (int, error) {
 			firstErr = err
 		}
 	}
+	if err := copyWebsiteAssets(); err != nil {
+		log.Printf("[generate] error while copying website assets: %v", err)
+		if firstErr == nil {
+			firstErr = err
+		}
+	}
 
 	return len(generated), firstErr
+}
+
+func clearWebsiteOutput() error {
+	if err := os.MkdirAll(websiteDir(), 0755); err != nil {
+		return err
+	}
+
+	keep := map[string]struct{}{
+		"src":         {},
+		"config.json": {},
+	}
+	activeSource := contentDir()
+	if filepath.Dir(activeSource) == websiteDir() {
+		keep[filepath.Base(activeSource)] = struct{}{}
+	}
+
+	entries, err := os.ReadDir(websiteDir())
+	if err != nil {
+		return err
+	}
+	for _, entry := range entries {
+		if _, preserve := keep[entry.Name()]; preserve {
+			continue
+		}
+		if err := os.RemoveAll(filepath.Join(websiteDir(), entry.Name())); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func copyWebsiteAssets() error {
+	source := assetsDir()
+	if _, err := os.Stat(source); os.IsNotExist(err) {
+		return nil
+	} else if err != nil {
+		return err
+	}
+
+	destination := filepath.Join(websiteDir(), "assets")
+	return filepath.WalkDir(source, func(path string, entry os.DirEntry, walkErr error) error {
+		if walkErr != nil {
+			return walkErr
+		}
+		relative, err := filepath.Rel(source, path)
+		if err != nil {
+			return err
+		}
+		target := filepath.Join(destination, relative)
+		info, err := entry.Info()
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			return os.MkdirAll(target, info.Mode().Perm())
+		}
+		if !info.Mode().IsRegular() {
+			return fmt.Errorf("unsupported asset type: %s", path)
+		}
+
+		input, err := os.Open(path)
+		if err != nil {
+			return err
+		}
+		output, err := os.OpenFile(target, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, info.Mode().Perm())
+		if err != nil {
+			input.Close()
+			return err
+		}
+		_, copyErr := io.Copy(output, input)
+		inputErr := input.Close()
+		outputErr := output.Close()
+		if copyErr != nil {
+			return copyErr
+		}
+		if inputErr != nil {
+			return inputErr
+		}
+		return outputErr
+	})
 }
 
 // sitemap is the sitemap.xml document, see https://www.sitemaps.org/protocol.html

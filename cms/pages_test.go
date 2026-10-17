@@ -102,6 +102,31 @@ func TestGenerateWritesToWebsiteRoot(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(source, "layout_home.html"), []byte("<html><body>{{yield}}</body></html>"), 0644); err != nil {
 		t.Fatal(err)
 	}
+	assets := filepath.Join(source, "assets", "css")
+	if err := os.MkdirAll(assets, 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(assets, "site.css"), []byte("body { color: red; }"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.MkdirAll(websiteDir(), 0755); err != nil {
+		t.Fatal(err)
+	}
+	for name, body := range map[string]string{
+		"config.json": "{\"name\":\"simple\"}",
+		"stale.html":  "old output",
+	} {
+		if err := os.WriteFile(filepath.Join(websiteDir(), name), []byte(body), 0644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	staleAssets := filepath.Join(websiteDir(), "assets")
+	if err := os.MkdirAll(staleAssets, 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(staleAssets, "old.css"), []byte("old asset"), 0644); err != nil {
+		t.Fatal(err)
+	}
 	renderOpts.Directory = source
 
 	generated, err := generate(newRenderer())
@@ -111,9 +136,20 @@ func TestGenerateWritesToWebsiteRoot(t *testing.T) {
 	if generated != 1 {
 		t.Fatalf("generate() wrote %d pages, want 1", generated)
 	}
-	for _, name := range []string{"index.html", "sitemap.xml"} {
+	for _, name := range []string{"index.html", "sitemap.xml", filepath.Join("assets", "css", "site.css")} {
 		if _, err := os.Stat(filepath.Join(websiteDir(), name)); err != nil {
 			t.Errorf("generated file %q missing from website root: %v", name, err)
+		}
+	}
+	if _, err := os.Stat(filepath.Join(websiteDir(), "config.json")); err != nil {
+		t.Errorf("per-site config was not preserved: %v", err)
+	}
+	if _, err := os.Stat(filepath.Join(websiteDir(), "src", "pages", "index.html")); err != nil {
+		t.Errorf("source directory was not preserved: %v", err)
+	}
+	for _, name := range []string{"stale.html", filepath.Join("assets", "old.css")} {
+		if _, err := os.Stat(filepath.Join(websiteDir(), name)); !os.IsNotExist(err) {
+			t.Errorf("stale output %q still exists, stat error = %v", name, err)
 		}
 	}
 	if _, err := os.Stat(filepath.Join(websiteDir(), "docs")); !os.IsNotExist(err) {
