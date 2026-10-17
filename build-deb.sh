@@ -36,11 +36,11 @@ mkdir -p "$STAGE/opt/doolox"
 install -m 0755 "$ROOT/bin/doolox" "$STAGE/opt/doolox/doolox"
 cp -R "$ROOT/assets" "$STAGE/opt/doolox/assets"
 
-# 4. Read-only seed data used to populate ~/doolox on first run.
+# 4. Read-only seed data (defaults/) used to populate ~/doolox on first run.
 mkdir -p "$STAGE/opt/doolox/seed"
-cp -R "$ROOT/content" "$STAGE/opt/doolox/seed/content"
-cp "$ROOT/config.json" "$STAGE/opt/doolox/seed/config.json"
-cp "$ROOT/doolox.db" "$STAGE/opt/doolox/seed/doolox.db"
+cp -R "$ROOT/defaults/content" "$STAGE/opt/doolox/seed/content"
+cp "$ROOT/defaults/config.json" "$STAGE/opt/doolox/seed/config.json"
+cp "$ROOT/defaults/doolox.db" "$STAGE/opt/doolox/seed/doolox.db"
 
 # 5. Icons -> hicolor theme + pixmaps fallback (the .desktop uses Icon=doolox).
 #    Render PNGs at multiple sizes from the SVG (reusing the project's Go
