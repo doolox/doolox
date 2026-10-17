@@ -20,7 +20,9 @@ func TestIndex(t *testing.T) {
 	body := rec.Body.String()
 	for _, want := range []string{
 		"Doolox",
-		"Hello World",
+		"Add Page",
+		"Add Post",
+		"Existing pages",
 		"app-wrapper",
 		"sidebar-brand",
 		"static website builder",
@@ -57,6 +59,17 @@ func TestUnknownPathIsNotFound(t *testing.T) {
 
 	if rec.Code != http.StatusNotFound {
 		t.Fatalf("status = %d, want %d", rec.Code, http.StatusNotFound)
+	}
+}
+
+func TestDeleteRequiresPost(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "/delete", nil)
+	rec := httptest.NewRecorder()
+
+	handler().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusMethodNotAllowed {
+		t.Fatalf("status = %d, want %d", rec.Code, http.StatusMethodNotAllowed)
 	}
 }
 

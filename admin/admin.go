@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"os"
 	"strings"
+
+	"doolox/cms"
 )
 
 // addr is the address the admin web server listens on.
@@ -33,6 +35,7 @@ var indexTmpl = template.Must(template.ParseFS(templatesFS, "theme/templates/*.h
 // pageData holds the values injected into the layout template.
 type pageData struct {
 	Version string
+	Pages   []cms.Page
 }
 
 // appVersion reads the Doolox version from version.iss. It returns "dev" when
@@ -88,14 +91,34 @@ func handler() http.Handler {
 		w.Write(logo)
 	})
 
-	// The single admin page for now; everything else is a 404.
+	// Delete a page (POST) and redirect back to the index.
+	mux.HandleFunc("/delete", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		url := r.FormValue("url")
+		if url == "" {
+			http.Error(w, "missing url", http.StatusBadRequest)
+			return
+		}
+		if err := cms.DeletePage(url); err != nil {
+			log.Printf("[admin] delete %q: %v", url, err)
+			http.Error(w, "could not delete page", http.StatusInternalServerError)
+			return
+		}
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+	})
+
+	// The admin index page.
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
 			http.NotFound(w, r)
 			return
 		}
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		if err := indexTmpl.ExecuteTemplate(w, "layout.html", pageData{Version: appVersion()}); err != nil {
+		data := pageData{Version: appVersion(), Pages: cms.Pages()}
+		if err := indexTmpl.ExecuteTemplate(w, "layout.html", data); err != nil {
 			log.Printf("[admin] render index: %v", err)
 		}
 	})
