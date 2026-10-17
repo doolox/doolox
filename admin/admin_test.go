@@ -73,6 +73,25 @@ func TestDeleteRequiresPost(t *testing.T) {
 	}
 }
 
+func TestIndexShowsFlashMessage(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "/?status=success&msg=hello", nil)
+	rec := httptest.NewRecorder()
+
+	handler().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d", rec.Code, http.StatusOK)
+	}
+
+	body := rec.Body.String()
+	if !strings.Contains(body, "hello") {
+		t.Error("index body missing flash message")
+	}
+	if !strings.Contains(body, "alert-success") {
+		t.Error("index body missing success alert")
+	}
+}
+
 func TestParseVersion(t *testing.T) {
 	tests := []struct {
 		in   string

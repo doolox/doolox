@@ -2,9 +2,11 @@ package admin
 
 import (
 	"embed"
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 
@@ -36,6 +38,8 @@ var indexTmpl = template.Must(template.ParseFS(templatesFS, "theme/templates/*.h
 type pageData struct {
 	Version string
 	Pages   []cms.Page
+	Message string
+	Error   bool
 }
 
 // appVersion reads the Doolox version from version.iss. It returns "dev" when
@@ -110,6 +114,18 @@ func handler() http.Handler {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	})
 
+	// Generate the static website and redirect back to the index with a success
+	// or error message.
+	mux.HandleFunc("/generate", func(w http.ResponseWriter, r *http.Request) {
+		generated, err := cms.GenerateSite()
+		if err != nil {
+			http.Redirect(w, r, "/?status=error&msg="+url.QueryEscape(err.Error()), http.StatusSeeOther)
+			return
+		}
+		msg := fmt.Sprintf("Site generated: %d pages", generated)
+		http.Redirect(w, r, "/?status=success&msg="+url.QueryEscape(msg), http.StatusSeeOther)
+	})
+
 	// The admin index page.
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
@@ -117,7 +133,12 @@ func handler() http.Handler {
 			return
 		}
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		data := pageData{Version: appVersion(), Pages: cms.Pages()}
+		data := pageData{
+			Version: appVersion(),
+			Pages:   cms.Pages(),
+			Message: r.URL.Query().Get("msg"),
+			Error:   r.URL.Query().Get("status") == "error",
+		}
 		if err := indexTmpl.ExecuteTemplate(w, "layout.html", data); err != nil {
 			log.Printf("[admin] render index: %v", err)
 		}
