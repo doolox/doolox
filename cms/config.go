@@ -9,7 +9,6 @@ import (
 
 // Config struct holds all our configuration
 type Config struct {
-	Debug   bool   `json:"debug"`
 	Theme   string `json:"theme"`
 	URL     string `json:"url"`
 	Website string `json:"website"`
@@ -38,7 +37,9 @@ func (sc *Config) Load(configFile string) error {
 
 func initConfig() *Config {
 	c := &Config{}
-	c.Load(filepath.Join(dataRoot(), "config.json"))
+	if err := c.Load(filepath.Join(dataRoot(), "config.json")); err != nil {
+		log.Printf("[initConfig] could not load config: %v", err)
+	}
 	return c
 }
 

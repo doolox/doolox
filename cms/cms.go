@@ -15,6 +15,8 @@ var m *macaron.Macaron
 var conf *Config
 
 func init() {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
 	setupDataDir()
 
 	conf = initConfig()
@@ -27,8 +29,6 @@ func init() {
 // Start runs the Doolox web server and shows the system tray icon. It blocks
 // until the tray is quit, then shuts the server down and returns.
 func Start(trayIcon TrayIcon, openWebsite bool) {
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
-
 	m.Get("/", pageView)
 	m.Get("/generate", generateView)
 	m.Get("/doolox.js", dooloxJSView)
