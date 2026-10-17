@@ -1,15 +1,15 @@
 # Installing and building Doolox
 
-Doolox is a Go program. The admin interface opens in a **native web view**
-(webview/webview_go), which links through cgo on every platform and requires
-the matching native toolkit (GTK/WebKitGTK on Linux, WebView2 on Windows,
-WKWebView on macOS).
+Doolox is a Go program. The admin interface opens in a **native web view** on
+Windows and macOS (webview/webview_go). On Linux the dashboard opens in the
+system browser instead, because embedding WebKitGTK in a Go process is
+unreliable.
 
 ## Prerequisites
 
 | OS        | Requirements                                                                                                        |
 |-----------|----------------------------------------------------------------------------------------------------------------------|
-| Linux     | Go 1.26+, gcc/g++, GTK 3 + WebKitGTK (`sudo apt install build-essential libgtk-3-dev libwebkit2gtk-4.1-dev`)         |
+| Linux     | Go 1.26+                                                                                                           |
 | macOS     | Go 1.26+ and Xcode Command Line Tools (`xcode-select --install`)                                                     |
 | Windows   | Go 1.26+ and MinGW-w64 gcc/g++ (https://www.mingw-w64.org/)                                                          |
 
@@ -22,7 +22,7 @@ make build          # -> bin/doolox
 
 ## Debian / Ubuntu / Linux Mint (.deb package)
 
-Build the installer (requires `dpkg-deb` and the GTK/WebKitGTK build deps above):
+Build the installer (requires `dpkg-deb`):
 
 ```sh
 make build-deb       # -> dist/doolox_<version>_amd64.deb
@@ -87,9 +87,9 @@ ISCC.exe installer.iss    # -> dist\doolox-setup-<version>.exe
 
 ## Cross-compilation
 
-The native web view links through cgo, so cross-compiling is **not supported**
-— build natively on each OS. macOS additionally cannot be cross-compiled
-(Objective-C + cgo); build it on a Mac.
+The Windows and macOS builds link a native web view through cgo, so those
+cannot be cross-compiled — build them natively. macOS additionally cannot be
+cross-compiled (Objective-C + cgo).
 
 ## Other Makefile targets
 
@@ -135,14 +135,11 @@ make help       # list all targets
   `C:\Program Files\Doolox\admin\theme` on Windows) and served by the admin
   server at http://localhost:5555. The HTML templates and logo are embedded
   with `go:embed`; only the CSS/JS/favicon are read from disk at runtime.
-- The native web view uses `webview/webview_go`, vendored under
-  `third_party/webview_go` with a one-line patch to build against WebKitGTK
-  4.1 (Ubuntu 24.04+ / Debian 13); see the `replace` directive in `go.mod`.
-- On Linux, WebKitGTK's JavaScriptCore conflicts with the Go runtime over
-  signal handling (it aborts with "Overriding existing handler for signal
-  10"). The dashboard works around it by setting `JSC_SIGNAL_FOR_GC=18`
-  (SIGCONT); if that signal is unsuitable, override it with the
-  `JSC_SIGNAL_FOR_GC` environment variable.
+- The native web view uses `webview/webview_go` (vendored under
+  `third_party/webview_go`; see the `replace` directive in `go.mod`). It is
+  only used on Windows and macOS — on Linux the dashboard opens in the system
+  browser, because WebKitGTK's JavaScriptCore conflicts with the Go runtime
+  over signal handling and the web view cannot be re-created after closing.
 - The app version is configured in `version.iss` — the single source of truth
   used by both the Inno Setup (`installer.iss`) and Debian (`build-deb.sh`)
   packaging. Bump it there and rebuild.

@@ -1,10 +1,10 @@
 # Doolox build/development Makefile.
 #
-# The admin interface opens in a native web view (webview/webview_go), which
-# links through cgo on every platform and needs the matching native toolkit:
-#   Linux   -> gcc/g++ plus GTK 3 and WebKitGTK (libwebkit2gtk-4.0-dev)
+# The admin interface opens in a native web view on Windows and macOS
+# (webview/webview_go, which links through cgo):
 #   macOS   -> Xcode CLT (xcode-select --install)
 #   Windows -> MinGW-w64 gcc/g++ (see INSTALL.md)
+# On Linux the dashboard opens in the system browser, so the build is pure Go.
 #
 # The native web view cannot be cross-compiled, so build natively on each OS
 # (see build.ps1 for Windows).
