@@ -54,12 +54,12 @@ func TestSimpleSeedLayoutsRender(t *testing.T) {
 	}
 }
 
-func TestDooloxSeedLayoutsRender(t *testing.T) {
+func TestAppendSeedLayoutsRender(t *testing.T) {
 	_, sourceFile, _, ok := runtime.Caller(0)
 	if !ok {
 		t.Fatal("could not locate test source")
 	}
-	content := filepath.Join(filepath.Dir(sourceFile), "..", "defaults", "doolox", "src")
+	content := filepath.Join(filepath.Dir(sourceFile), "..", "defaults", "append", "src")
 
 	previousOpts := renderOpts
 	renderOpts.Directory = content

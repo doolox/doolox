@@ -44,7 +44,7 @@ func initConfig() *Config {
 }
 
 // defaultWebsite is the website name used when config.json does not set one.
-const defaultWebsite = "doolox"
+const defaultWebsite = "append"
 
 // Website returns the name of the current website from the configuration. It
 // falls back to defaultWebsite when no name is configured.

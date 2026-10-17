@@ -40,7 +40,7 @@ This installs the binary to `/opt/doolox`, a launcher to `/usr/bin/doolox`,
 a menu entry and icons, plus the bundled templates and config. On first launch
 a `doolox` folder is created in your home directory, containing `config.json`,
 plus a `websites/` subfolder containing the bundled `simple/src/` and
-`doolox/src/` site sources. Generated HTML pages and `sitemap.xml` are written
+`append/src/` site sources. Generated HTML pages and `sitemap.xml` are written
 to the root of the selected website folder. An empty `templates/` folder is
 also created. Logs are written to `~/doolox/doolox.log`.
 Run `doolox` from a terminal or launch it from the application menu.
@@ -128,7 +128,7 @@ make help       # list all targets
   The page URL is the file name without the extension (`about.html` ->
   `/about`); `index.html` is the home page.
 - The website name is set in `config.json` (`"website"`) and defaults to
-  `doolox`; it names the folder under `~/doolox/websites/`.
+  `append`; it names the folder under `~/doolox/websites/`.
 - The tray icon assets (`assets/trayicon.svg`, `assets/trayicon.png`,
   `assets/trayicon.ico`) are embedded into the binary at build time with
   `go:embed`, so no extra runtime files are needed.
