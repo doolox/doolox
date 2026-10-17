@@ -59,3 +59,21 @@ func TestUnknownPathIsNotFound(t *testing.T) {
 		t.Fatalf("status = %d, want %d", rec.Code, http.StatusNotFound)
 	}
 }
+
+func TestParseVersion(t *testing.T) {
+	tests := []struct {
+		in   string
+		want string
+	}{
+		{"#define MyAppVersion \"1.0.1\"\n", "1.0.1"},
+		{"#define MyAppVersion \"2.3.4\"", "2.3.4"},
+		{"ignored\n#define MyAppVersion \"0.9.0\"\ntail", "0.9.0"},
+		{"no version here", ""},
+	}
+
+	for _, tt := range tests {
+		if got := parseVersion([]byte(tt.in)); got != tt.want {
+			t.Errorf("parseVersion(%q) = %q, want %q", tt.in, got, tt.want)
+		}
+	}
+}
