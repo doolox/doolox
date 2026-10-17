@@ -81,6 +81,46 @@ func TestNewPage(t *testing.T) {
 	}
 }
 
+func TestGenerateWritesToWebsiteRoot(t *testing.T) {
+	t.Setenv(dooloxHomeEnv, t.TempDir())
+	previousConf := conf
+	previousOpts := renderOpts
+	conf = &Config{Website: "simple", URL: "https://example.com"}
+	defer func() {
+		conf = previousConf
+		renderOpts = previousOpts
+	}()
+
+	source := sourceDir()
+	pagesPath := filepath.Join(source, "pages")
+	if err := os.MkdirAll(pagesPath, 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(pagesPath, "index.html"), []byte("<!--\ntitle: Home\n-->\n{{define \"index\"}}Home page{{end}}"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(source, "layout_home.html"), []byte("<html><body>{{yield}}</body></html>"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	renderOpts.Directory = source
+
+	generated, err := generate(newRenderer())
+	if err != nil {
+		t.Fatalf("generate() error = %v", err)
+	}
+	if generated != 1 {
+		t.Fatalf("generate() wrote %d pages, want 1", generated)
+	}
+	for _, name := range []string{"index.html", "sitemap.xml"} {
+		if _, err := os.Stat(filepath.Join(websiteDir(), name)); err != nil {
+			t.Errorf("generated file %q missing from website root: %v", name, err)
+		}
+	}
+	if _, err := os.Stat(filepath.Join(websiteDir(), "docs")); !os.IsNotExist(err) {
+		t.Errorf("docs directory exists after generation, stat error = %v", err)
+	}
+}
+
 func TestPagesLegacyHomeMapsToIndex(t *testing.T) {
 	dir := t.TempDir()
 	t.Setenv(dooloxHomeEnv, dir)

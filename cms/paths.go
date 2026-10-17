@@ -56,9 +56,6 @@ func assetsDir() string {
 	return filepath.Join(contentDir(), "theme", "assets")
 }
 
-// docsDir is the folder the static website is generated into.
-func docsDir() string { return filepath.Join(websiteDir(), "docs") }
-
 // logFile is the file all log output is written to.
 func logFile() string { return filepath.Join(dataRoot(), "doolox.log") }
 
@@ -81,11 +78,11 @@ func setupDataDir() {
 	log.SetOutput(io.MultiWriter(f, os.Stderr))
 }
 
-// setupWebsiteDir creates the generated-site folder for the current website.
+// setupWebsiteDir creates the root folder for the current website.
 // It must run after initDb, because the website name is read from the
 // key-value store.
 func setupWebsiteDir() {
-	if err := os.MkdirAll(docsDir(), 0755); err != nil {
-		log.Printf("[setup] could not create %s: %v", docsDir(), err)
+	if err := os.MkdirAll(websiteDir(), 0755); err != nil {
+		log.Printf("[setup] could not create %s: %v", websiteDir(), err)
 	}
 }

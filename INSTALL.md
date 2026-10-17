@@ -39,8 +39,10 @@ sudo apt install ./dist/doolox_*.deb
 This installs the binary to `/opt/doolox`, a launcher to `/usr/bin/doolox`,
 a menu entry and icons, plus the bundled templates and config. On first launch
 a `doolox` folder is created in your home directory, containing `config.json`,
-plus a `websites/` subfolder with `content/` and an empty `docs/` folder, and
-an empty `templates/` folder. Logs are written to `~/doolox/doolox.log`.
+plus a `websites/` subfolder containing the bundled `simple/src/` and
+`doolox/src/` site sources. Generated HTML pages and `sitemap.xml` are written
+to the root of the selected website folder. An empty `templates/` folder is
+also created. Logs are written to `~/doolox/doolox.log`.
 Run `doolox` from a terminal or launch it from the application menu.
 
 Remove it with:

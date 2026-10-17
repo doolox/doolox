@@ -34,7 +34,7 @@ func GenerateSite() (int, error) {
 }
 
 // generate renders every page stored in the database to a static HTML file
-// inside docs and returns how many files were written plus the first error
+// in the website root and returns how many files were written plus the first error
 // encountered, if any. The sitemap of the generated pages is written as well.
 //
 // It does not crawl anything, the pages are read from the database. Files that
@@ -59,7 +59,7 @@ func generate(render macaron.Render) (int, error) {
 			continue
 		}
 
-		path := filepath.Join(docsDir(), page.URL+".html")
+		path := filepath.Join(websiteDir(), page.URL+".html")
 
 		if err := os.WriteFile(path, []byte(html), 0644); err != nil {
 			log.Printf("[generate] error while writing %q: %v", path, err)
@@ -98,7 +98,7 @@ type sitemapURL struct {
 	Priority string `xml:"priority"`
 }
 
-// generateSitemap writes docs/sitemap.xml listing the given pages.
+// generateSitemap writes sitemap.xml in the website root.
 func generateSitemap(pages []*Page) error {
 	site := strings.TrimSuffix(conf.URL, "/")
 
@@ -132,7 +132,7 @@ func generateSitemap(pages []*Page) error {
 		return err
 	}
 
-	path := filepath.Join(docsDir(), "sitemap.xml")
+	path := filepath.Join(websiteDir(), "sitemap.xml")
 	out := xml.Header + string(body) + "\n"
 
 	if err := os.WriteFile(path, []byte(out), 0644); err != nil {

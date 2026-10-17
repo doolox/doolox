@@ -27,6 +27,4 @@ fi
 if [ ! -f "$DATA_DIR/config.json" ]; then
     cp "$SEED_DIR/config.json" "$DATA_DIR/"
 fi
-mkdir -p "$WEB_DIR/docs" "$SIMPLE_DIR/docs"
-
 exec "$APP_DIR/doolox" "$@"

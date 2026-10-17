@@ -97,9 +97,7 @@ Source: "defaults\simple\src\*"; DestDir: "{%USERPROFILE}\doolox\websites\simple
 Source: "defaults\config.json"; DestDir: "{%USERPROFILE}\doolox"; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall
 
 [Dirs]
-; Empty docs folder (generated static site) and the reserved templates folder.
-Name: "{%USERPROFILE}\doolox\websites\doolox\docs"; Flags: uninsneveruninstall
-Name: "{%USERPROFILE}\doolox\websites\simple\docs"; Flags: uninsneveruninstall
+; Reserved templates folder.
 Name: "{%USERPROFILE}\doolox\templates"; Flags: uninsneveruninstall
 
 [Icons]
