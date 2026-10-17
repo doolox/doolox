@@ -41,6 +41,9 @@ func TestSimpleSeedLayoutsRender(t *testing.T) {
 			if !strings.Contains(html, "/assets/img/favicon.ico") {
 				t.Errorf("rendered %s page is missing the Doolox favicon", pageURL)
 			}
+			if !strings.Contains(html, "/assets/img/favicon.svg") {
+				t.Errorf("rendered %s page is missing the Simple SVG favicon", pageURL)
+			}
 			if pageURL == indexPage && !strings.Contains(html, "framework: bootstrap") {
 				t.Error("rendered homepage is missing the software preview")
 			}
