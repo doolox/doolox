@@ -30,6 +30,7 @@ func Start(trayIcon TrayIcon) {
 
 	m.Get("/", pageView)
 	m.Get("/generate", generateView)
+	m.Get("/doolox.js", dooloxJSView)
 	m.Get("/:page", pageView)
 
 	server := &http.Server{

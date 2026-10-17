@@ -2,6 +2,7 @@ package cms
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	macaron "gopkg.in/macaron.v1"
@@ -32,15 +33,24 @@ func pageView(ctx *macaron.Context) {
 	}
 	ctx.Data["Page"] = p
 
-	ctx.HTML(
-		http.StatusOK,
-		page,
-		ctx.Data,
-		macaron.HTMLOptions{Layout: layoutFor(page)})
+	// Render to a string so the Doolox preview helper can be injected for
+	// live serving only (the static site generator renders without it).
+	html, err := ctx.Render.HTMLString(page, ctx.Data, macaron.HTMLOptions{Layout: layoutFor(page)})
+	if err != nil {
+		log.Printf("[pageView] render %q: %v", page, err)
+		ctx.Status(http.StatusInternalServerError)
+		return
+	}
+
+	ctx.Resp.Header().Set("Content-Type", "text/html; charset=utf-8")
+	ctx.Resp.WriteHeader(http.StatusOK)
+	ctx.Resp.Write([]byte(injectDooloxJS(html)))
 }
 
 func generateView(ctx *macaron.Context) {
-	generated, err := generate(ctx.Render)
+	// GenerateSite also shows a native system notification (the same one the
+	// tray menu's "Generate" action uses).
+	generated, err := GenerateSite()
 	if err != nil {
 		ctx.Render.PlainText(
 			http.StatusInternalServerError,
