@@ -1,16 +1,17 @@
 # Installing and building Doolox
 
-Doolox is a Go program that links **SQLite through cgo**
-(`github.com/mattn/go-sqlite3`), so a **C compiler is required on every
-platform**. The menu-bar icon also uses cgo/Objective-C on macOS.
+Doolox is a Go program. The admin interface opens in a **native web view**
+(webview/webview_go), which links through cgo on every platform and requires
+the matching native toolkit (GTK/WebKitGTK on Linux, WebView2 on Windows,
+WKWebView on macOS).
 
 ## Prerequisites
 
-| OS        | Requirements                                                                          |
-|-----------|----------------------------------------------------------------------------------------|
-| Linux     | Go 1.26+ and gcc (`sudo apt install build-essential`)                                  |
-| macOS     | Go 1.26+ and Xcode Command Line Tools (`xcode-select --install`)                       |
-| Windows   | Go 1.26+ and MinGW-w64 gcc (https://www.mingw-w64.org/)                                |
+| OS        | Requirements                                                                                                        |
+|-----------|----------------------------------------------------------------------------------------------------------------------|
+| Linux     | Go 1.26+, gcc/g++, GTK 3 + WebKitGTK (`sudo apt install build-essential libgtk-3-dev libwebkit2gtk-4.1-dev`)         |
+| macOS     | Go 1.26+ and Xcode Command Line Tools (`xcode-select --install`)                                                     |
+| Windows   | Go 1.26+ and MinGW-w64 gcc/g++ (https://www.mingw-w64.org/)                                                          |
 
 ## Linux
 
@@ -21,7 +22,7 @@ make build          # -> bin/doolox
 
 ## Debian / Ubuntu / Linux Mint (.deb package)
 
-Build the installer (requires `dpkg-deb` and a C compiler for cgo):
+Build the installer (requires `dpkg-deb` and the GTK/WebKitGTK build deps above):
 
 ```sh
 make build-deb       # -> dist/doolox_<version>_amd64.deb
@@ -36,11 +37,10 @@ sudo apt install ./dist/doolox_*.deb
 ```
 
 This installs the binary to `/opt/doolox`, a launcher to `/usr/bin/doolox`,
-a menu entry and icons, plus the bundled templates/database. On first launch a
-`doolox` folder is created in your home directory, containing `config.json`
-and `doolox.db`, plus a `websites/` subfolder with `content/` and an empty
-`docs/` folder, and an empty `templates/` folder. Logs are written to
-`~/doolox/doolox.log`.
+a menu entry and icons, plus the bundled templates and config. On first launch
+a `doolox` folder is created in your home directory, containing `config.json`,
+plus a `websites/` subfolder with `content/` and an empty `docs/` folder, and
+an empty `templates/` folder. Logs are written to `~/doolox/doolox.log`.
 Run `doolox` from a terminal or launch it from the application menu.
 
 Remove it with:
@@ -72,10 +72,10 @@ Option A — PowerShell (no `make` required):
 .\build.ps1         # -> bin\doolox-windows-amd64.exe
 ```
 
-Option B — Git Bash / MSYS2 with `make` and MinGW-w64 gcc:
+Option B — Git Bash / MSYS2 with `make`:
 
 ```sh
-make build-windows  # -> bin/doolox-windows-amd64.exe
+make build         # -> bin/doolox.exe
 ```
 
 Option C — Inno Setup installer (requires Inno Setup 6+):
@@ -85,20 +85,11 @@ Option C — Inno Setup installer (requires Inno Setup 6+):
 ISCC.exe installer.iss    # -> dist\doolox-setup-<version>.exe
 ```
 
-## Cross-compilation (optional)
+## Cross-compilation
 
-Cross-compiling requires the matching **cross C compiler** (because of cgo):
-
-```sh
-# on Linux/macOS, build a Windows binary (needs x86_64-w64-mingw32-gcc):
-make build-windows CC=x86_64-w64-mingw32-gcc
-
-# on macOS/Windows, build a Linux binary (needs x86_64-linux-gnu-gcc):
-make build-linux CC=x86_64-linux-gnu-gcc
-```
-
-macOS cannot be cross-compiled from other OSes (Objective-C + cgo); build it
-on a Mac.
+The native web view links through cgo, so cross-compiling is **not supported**
+— build natively on each OS. macOS additionally cannot be cross-compiled
+(Objective-C + cgo); build it on a Mac.
 
 ## Other Makefile targets
 
@@ -117,9 +108,25 @@ make help       # list all targets
 ## Notes
 
 - `go.mod` declares `go 1.26.5`.
-- `build-windows` / `build.ps1` pass `-H=windowsgui` so the app does not open
+- `build.ps1` passes `-H=windowsgui` so the app does not open
   a console window when launched.
-- All platforms build with cgo enabled (`CGO_ENABLED=1`) because of SQLite.
+- Pages are plain files in `content/pages/*.html`. Each page's metadata
+  (`title`, `subtitle`, `description`, `type`) lives in an optional
+  front-matter comment at the top of the file:
+
+  ```html
+  <!--
+  title: About Doolox
+  subtitle: About
+  type: page
+  -->
+  {{define "about"}} ... {{end}}
+  ```
+
+  The page URL is the file name without the extension (`about.html` ->
+  `/about`); `index.html` is the home page.
+- The website name is set in `config.json` (`"website"`) and defaults to
+  `doolox`; it names the folder under `~/doolox/websites/`.
 - The tray icon assets (`assets/trayicon.svg`, `assets/trayicon.png`,
   `assets/trayicon.ico`) are embedded into the binary at build time with
   `go:embed`, so no extra runtime files are needed.
@@ -128,6 +135,14 @@ make help       # list all targets
   `C:\Program Files\Doolox\admin\theme` on Windows) and served by the admin
   server at http://localhost:5555. The HTML templates and logo are embedded
   with `go:embed`; only the CSS/JS/favicon are read from disk at runtime.
+- The native web view uses `webview/webview_go`, vendored under
+  `third_party/webview_go` with a one-line patch to build against WebKitGTK
+  4.1 (Ubuntu 24.04+ / Debian 13); see the `replace` directive in `go.mod`.
+- On Linux, WebKitGTK's JavaScriptCore conflicts with the Go runtime over
+  signal handling (it aborts with "Overriding existing handler for signal
+  10"). The dashboard works around it by setting `JSC_SIGNAL_FOR_GC=18`
+  (SIGCONT); if that signal is unsuitable, override it with the
+  `JSC_SIGNAL_FOR_GC` environment variable.
 - The app version is configured in `version.iss` — the single source of truth
   used by both the Inno Setup (`installer.iss`) and Debian (`build-deb.sh`)
   packaging. Bump it there and rebuild.

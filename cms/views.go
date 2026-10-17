@@ -25,12 +25,15 @@ func pageView(ctx *macaron.Context) {
 		page = indexPage
 	}
 
-	p := &Page{URL: page}
-	db.FirstOrCreate(p, p)
+	p, ok := pageByURL(page)
+	if !ok {
+		ctx.Status(http.StatusNotFound)
+		return
+	}
 	ctx.Data["Page"] = p
 
 	ctx.HTML(
-		200,
+		http.StatusOK,
 		page,
 		ctx.Data,
 		macaron.HTMLOptions{Layout: layoutFor(page)})

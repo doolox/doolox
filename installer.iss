@@ -15,7 +15,6 @@
 ;          admin\theme\...                    (admin web interface)
 ;      %USERPROFILE%\doolox\
 ;          config.json
-;          doolox.db                         (pre-seeded example pages)
 ;          websites\
 ;              content\...                   (templates + theme assets)
 ;              docs\                         (empty; static site is generated here)
@@ -91,11 +90,10 @@ Source: "admin\theme\*"; DestDir: "{app}\admin\theme"; Flags: ignoreversion recu
 ; ---------------------------------------------------------------------------
 ; Writable user data -> %USERPROFILE%\doolox.
 ; "onlyifdoesntexist" + "uninsneveruninstall" so reinstalls/upgrades and
-; uninstalls never clobber or delete the user's site content and database.
+; uninstalls never clobber or delete the user's site content and config.
 ; ---------------------------------------------------------------------------
 Source: "defaults\doolox\content\*"; DestDir: "{%USERPROFILE}\doolox\websites\doolox\content"; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist uninsneveruninstall
 Source: "defaults\config.json"; DestDir: "{%USERPROFILE}\doolox"; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall
-Source: "defaults\doolox.db";  DestDir: "{%USERPROFILE}\doolox"; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall
 
 [Dirs]
 ; Empty docs folder (generated static site) and the reserved templates folder.

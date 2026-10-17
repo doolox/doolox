@@ -9,9 +9,10 @@ import (
 
 // Config struct holds all our configuration
 type Config struct {
-	Debug bool   `json:"debug"`
-	Theme string `json:"theme"`
-	URL   string `json:"url"`
+	Debug   bool   `json:"debug"`
+	Theme   string `json:"theme"`
+	URL     string `json:"url"`
+	Website string `json:"website"`
 }
 
 // Load method loads configuration file to Config struct
@@ -39,4 +40,16 @@ func initConfig() *Config {
 	c := &Config{}
 	c.Load(filepath.Join(dataRoot(), "config.json"))
 	return c
+}
+
+// defaultWebsite is the website name used when config.json does not set one.
+const defaultWebsite = "doolox"
+
+// Website returns the name of the current website from the configuration. It
+// falls back to defaultWebsite when no name is configured.
+func Website() string {
+	if conf != nil && conf.Website != "" {
+		return conf.Website
+	}
+	return defaultWebsite
 }

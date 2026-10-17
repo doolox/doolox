@@ -4,8 +4,8 @@
     Build Doolox for Windows (native build, no `make` required).
 
 .DESCRIPTION
-    Requires Go 1.26+ and a C compiler (MinGW-w64 gcc), because Doolox links
-    SQLite through cgo.
+    Requires Go 1.26+ and a C++ compiler (MinGW-w64 gcc/g++), because the
+    admin interface opens in a native WebView2 web view via cgo.
 
 .EXAMPLE
     .\build.ps1
@@ -23,8 +23,9 @@ if (-not (Get-Command go -ErrorAction SilentlyContinue)) {
 
 if (-not (Get-Command gcc -ErrorAction SilentlyContinue)) {
     Write-Error @"
-No C compiler (gcc) found on PATH. Doolox links SQLite via cgo, so a C compiler
-is required. Install MinGW-w64 (https://www.mingw-w64.org/) and add gcc to PATH.
+No C/C++ compiler (gcc/g++) found on PATH. Doolox links a native web view via
+cgo, so a C++ compiler is required. Install MinGW-w64 (https://www.mingw-w64.org/)
+and add gcc to PATH.
 "@
     exit 1
 }
