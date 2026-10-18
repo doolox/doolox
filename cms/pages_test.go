@@ -146,9 +146,10 @@ func TestGenerateWritesToWebsiteRoot(t *testing.T) {
 			t.Errorf("generated file %q missing from website root: %v", name, err)
 		}
 	}
-	// The combined sitemap lives one level up, at the root of the websites dir.
-	if _, err := os.Stat(filepath.Join(websitesDir(), "sitemap.xml")); err != nil {
-		t.Errorf("combined sitemap missing from websites root: %v", err)
+	// The combined sitemap lives inside the main website's folder, next to the
+	// generated pages, so it ships with the deployable output.
+	if _, err := os.Stat(filepath.Join(websiteDir(site), "sitemap.xml")); err != nil {
+		t.Errorf("combined sitemap missing from website root: %v", err)
 	}
 	for _, name := range []string{"config.json", "README.md", "CNAME", filepath.Join(".git", "config")} {
 		if _, err := os.Stat(filepath.Join(websiteDir(site), name)); err != nil {

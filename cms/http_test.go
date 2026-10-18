@@ -281,9 +281,9 @@ func TestMultipleWebsitesRoutingAndCombinedSitemap(t *testing.T) {
 	if _, err := generate(); err != nil {
 		t.Fatalf("generate() error = %v", err)
 	}
-	data, err := os.ReadFile(filepath.Join(dir, "websites", "sitemap.xml"))
+	data, err := os.ReadFile(filepath.Join(dir, "websites", "simple", "sitemap.xml"))
 	if err != nil {
-		t.Fatalf("combined sitemap missing: %v", err)
+		t.Fatalf("combined sitemap missing from main website folder: %v", err)
 	}
 	body := string(data)
 	if !strings.Contains(body, "<loc>https://example.com/</loc>") {

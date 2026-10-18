@@ -335,7 +335,8 @@ websites/append/            # main site  -> /
 
 So a page `cms/src/pages/about.html` is reachable at `/cms/about`, and its
 assets live under `/cms/assets/...`. Generation renders every website into its
-own folder and writes a single combined `sitemap.xml` at the `websites/` root.
+own folder and writes a single combined `sitemap.xml` into the main website's
+folder.
 
 This is how the bundled theme ships a second, simpler site at `/cms`.
 
@@ -362,7 +363,8 @@ Generation:
 - renders every page of every website into a static `.html` file inside the
   website's own folder (next to `src/`),
 - copies each website's `assets/` into the output,
-- writes one combined `websites/sitemap.xml`,
+- writes one combined `sitemap.xml` into the main website's folder (so it ships
+  with the deployable output),
 - shows a native system notification with the result (e.g. *"Site generated: 4 pages"*).
 
 Before writing output, each website's previously generated files are cleared.

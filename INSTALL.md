@@ -42,8 +42,9 @@ a `doolox` folder is created in your home directory, containing `config.json`,
 plus a `websites/` subfolder with the bundled sites: the main `append/src/`
 site (served at `/`) and a nested `append/cms/src/` site (served at `/cms`).
 Each website's generated HTML pages and assets are written inside its own
-folder, and a single combined `sitemap.xml` is written at the `websites/`
-root. An empty `templates/` folder is also created. Logs are written to
+folder, and a single combined `sitemap.xml` is written into the main
+website's folder. An empty `templates/` folder is also created. Logs are
+written to
 `~/doolox/doolox.log`.
 Run `doolox` from a terminal or launch it from the application menu.
 

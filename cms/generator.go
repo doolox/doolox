@@ -42,9 +42,9 @@ type sitePage struct {
 }
 
 // generate renders every website to a static HTML file inside its own folder
-// and writes a single combined sitemap.xml at the root of the websites
-// directory. It returns how many files were written plus the first error
-// encountered, if any.
+// and writes a single combined sitemap.xml inside the main website's folder.
+// It returns how many files were written plus the first error encountered, if
+// any.
 //
 // It does not crawl anything; pages are read from disk. Before writing output,
 // each website's generated files are cleared while its source and per-site
@@ -229,8 +229,10 @@ type sitemapURL struct {
 	Priority string `xml:"priority"`
 }
 
-// generateSitemap writes a single combined sitemap.xml at the root of the
-// websites directory, listing every page of every website under its own path.
+// generateSitemap writes a single combined sitemap.xml inside the main
+// website's folder, listing every page of every website under its own path.
+// It is written after each website's output has been cleared, so it always
+// reflects the pages that were just generated.
 func generateSitemap(sitePages []sitePage) error {
 	site := strings.TrimSuffix(conf.URL, "/")
 
@@ -273,7 +275,7 @@ func generateSitemap(sitePages []sitePage) error {
 		return err
 	}
 
-	path := filepath.Join(websitesDir(), "sitemap.xml")
+	path := filepath.Join(websiteDir(Website()), "sitemap.xml")
 	out := xml.Header + string(body) + "\n"
 
 	if err := os.WriteFile(path, []byte(out), 0644); err != nil {
