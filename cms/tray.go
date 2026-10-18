@@ -69,6 +69,7 @@ func runTray(icon TrayIcon, onShutdown func()) {
 		})
 
 		mGenerate := systray.AddMenuItem("Generate", "Generate the static site")
+		mPublish := systray.AddMenuItem("Publish", "Generate the static site and push it with git")
 		mDashboard := systray.AddMenuItem("Doolox Dashboard", "Open the Doolox admin interface")
 
 		go func() {
@@ -76,6 +77,8 @@ func runTray(icon TrayIcon, onShutdown func()) {
 				select {
 				case <-mGenerate.ClickedCh:
 					generateSite()
+				case <-mPublish.ClickedCh:
+					publishSite()
 				case <-mDashboard.ClickedCh:
 					go launchDashboard()
 				}

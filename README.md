@@ -52,6 +52,7 @@ While running, Doolox exposes two local addresses:
 A **system tray icon** gives you the same controls without a browser:
 
 - **Generate** — generate the static site.
+- **Publish** — generate the static site and push it with git.
 - **Doolox Dashboard** — open the dashboard.
 - **Quit** — stop Doolox.
 
@@ -384,7 +385,7 @@ in one step. While viewing the live site, press `Ctrl+P` (`Cmd+P` on macOS):
    website's folder (`~/doolox/websites/<website>/`).
 
 A native system notification reports the result. The same action is available
-at `http://localhost:5000/publish`.
+from the tray menu (*Publish*) or at `http://localhost:5000/publish`.
 
 ---
 

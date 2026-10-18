@@ -66,3 +66,9 @@ func runGit(dir string, args ...string) (string, error) {
 	out, err := cmd.CombinedOutput()
 	return string(out), err
 }
+
+// publishSite generates the static website and pushes it with git. It is
+// called from the system tray menu.
+func publishSite() {
+	PublishSite()
+}
