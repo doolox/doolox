@@ -6,4 +6,4 @@
 ;    * build-deb.sh    (extracts it with sed, injects it into the Debian control)
 ;    * the Debian package (Version field, filled in by build-deb.sh)
 ; ============================================================================
-#define MyAppVersion "1.1.6"
+#define MyAppVersion "1.1.7"

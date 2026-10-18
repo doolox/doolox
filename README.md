@@ -374,6 +374,18 @@ The source (`src/` / `content/`), `config.json`, `.git`, nested website folders,
 > The sitemap needs `url` set in `config.json`; without it generation reports
 > *"no url set in the configuration"*.
 
+### Publishing with git
+
+If your website's folder is a git repository, you can generate **and** publish
+in one step. While viewing the live site, press `Ctrl+P` (`Cmd+P` on macOS):
+
+1. Doolox generates the static files (exactly like `Ctrl+G`), then
+2. runs `git commit -a -m "Doolox update."` and `git push` inside the
+   website's folder (`~/doolox/websites/<website>/`).
+
+A native system notification reports the result. The same action is available
+at `http://localhost:5000/publish`.
+
 ---
 
 ## Deploying the generated site
@@ -411,7 +423,8 @@ so the output needs no runtime.
 | ------------------ | -------------------------------------------------------- |
 | `/`                | Home page of the main website.                           |
 | `/generate`        | Generate the static site (returns plain text).           |
-| `/doolox.js`       | Live-preview helper (Ctrl+G shortcut).                   |
+| `/publish`         | Generate, then commit and push the site with git.        |
+| `/doolox.js`       | Live-preview helper (Ctrl+G / Ctrl+P shortcuts).         |
 | `/assets/*`        | Assets of the main website.                              |
 | `/:seg`            | Page of the main website, or home of a nested website.   |
 | `/:seg/:page`      | Page of the website named by the first segment.          |

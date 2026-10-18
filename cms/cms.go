@@ -29,6 +29,7 @@ func init() {
 // routes registers all HTTP routes on the given macaron instance.
 func routes(m *macaron.Macaron) {
 	m.Get("/generate", generateView)
+	m.Get("/publish", publishView)
 	m.Get("/doolox.js", dooloxJSView)
 	m.Get("/", homeView)
 	m.Get("/assets/*", assetsView)

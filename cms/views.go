@@ -119,3 +119,19 @@ func generateView(ctx *macaron.Context) {
 		http.StatusOK,
 		[]byte(fmt.Sprintf("generated %d pages\n", generated)))
 }
+
+// publishView generates the site and then commits and pushes it with git. It
+// is the endpoint behind the Ctrl+P preview shortcut.
+func publishView(ctx *macaron.Context) {
+	msg, err := PublishSite()
+	if err != nil {
+		ctx.Render.PlainText(
+			http.StatusInternalServerError,
+			[]byte(fmt.Sprintf("publish failed: %v\n", err)))
+		return
+	}
+
+	ctx.Render.PlainText(
+		http.StatusOK,
+		[]byte(msg+"\n"))
+}

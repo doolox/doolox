@@ -80,4 +80,10 @@ func TestDooloxJSServedAndInjected(t *testing.T) {
 	if !strings.Contains(body, "/generate") {
 		t.Error("/doolox.js body missing /generate endpoint")
 	}
+	if !strings.Contains(body, "Ctrl+P") {
+		t.Error("/doolox.js body missing Ctrl+P handling")
+	}
+	if !strings.Contains(body, "/publish") {
+		t.Error("/doolox.js body missing /publish endpoint")
+	}
 }
