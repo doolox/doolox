@@ -16,8 +16,8 @@
 ;      %USERPROFILE%\doolox\
 ;          config.json
 ;          websites\
-;              content\...                   (templates + theme assets)
-;              docs\                         (empty; static site is generated here)
+;              simple\...                    (bundled "simple" website)
+;              append\...                    (bundled "append" website)
 ;          templates\                        (empty; reserved for templates)
 ;          doolox.log                        (created by the app at runtime)
 ;
@@ -92,6 +92,7 @@ Source: "admin\theme\*"; DestDir: "{app}\admin\theme"; Flags: ignoreversion recu
 ; "onlyifdoesntexist" + "uninsneveruninstall" so reinstalls/upgrades and
 ; uninstalls never clobber or delete the user's site content and config.
 ; ---------------------------------------------------------------------------
+Source: "defaults\simple\*"; DestDir: "{%USERPROFILE}\doolox\websites\simple"; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist uninsneveruninstall; Check: ShouldSeedSiteSource('simple')
 Source: "defaults\append\*"; DestDir: "{%USERPROFILE}\doolox\websites\append"; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist uninsneveruninstall; Check: ShouldSeedSiteSource('append')
 Source: "defaults\config.json"; DestDir: "{%USERPROFILE}\doolox"; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall
 
