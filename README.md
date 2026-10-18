@@ -425,6 +425,7 @@ so the output needs no runtime.
 | `/`                | Home page of the main website.                           |
 | `/generate`        | Generate the static site (returns plain text).           |
 | `/publish`         | Generate, then commit and push the site with git.        |
+| `/dashboard`       | Open the Doolox Dashboard (native web view / browser).   |
 | `/doolox.js`       | Live-preview helper (Ctrl+G / Ctrl+P / Ctrl+D shortcuts). |
 | `/assets/*`        | Assets of the main website.                              |
 | `/:seg`            | Page of the main website, or home of a nested website.   |
@@ -439,7 +440,7 @@ While viewing the live site at `http://localhost:5000`:
 | -------- | ------------------------------------------------- |
 | `Ctrl+G` | Generate the static site.                         |
 | `Ctrl+P` | Generate, then commit and push the site with git. |
-| `Ctrl+D` | Open the Doolox Dashboard.                        |
+| `Ctrl+D` | Open the Doolox Dashboard (native web view on Windows/macOS). |
 
 On macOS, use `Cmd` instead of `Ctrl`.
 
@@ -459,6 +460,7 @@ make vet        # run go vet
 make fmt        # format all Go sources
 make tidy       # tidy module dependencies
 make build-deb  # build a .deb package for Debian/Ubuntu/Linux Mint
+make build-dmg  # build a macOS .dmg disk image (on macOS)
 make clean      # remove bin/
 make help       # list all targets
 ```

@@ -11,16 +11,18 @@ APP_DIR="/opt/doolox"
 SEED_DIR="/opt/doolox/seed"
 DATA_DIR="${DOOLOX_HOME:-$HOME/doolox}"
 SITE_DIR="$DATA_DIR/websites"
-# The website name must match the "website" key in config.json.
-APPEND_DIR="$SITE_DIR/append"
 
 # Seed anything that is missing, but never overwrite existing files, so a
-# user's edited content and config are preserved across launches. Nested
-# websites (subfolders of the main website) are copied along with it.
-mkdir -p "$DATA_DIR" "$APPEND_DIR" "$DATA_DIR/templates"
-if [ ! -d "$APPEND_DIR/src" ] && [ ! -d "$APPEND_DIR/content" ]; then
-    cp -R "$SEED_DIR/append/." "$APPEND_DIR/"
-fi
+# user's edited content and config are preserved across launches. Each website
+# folder is copied only if it does not already have a site source layout.
+mkdir -p "$DATA_DIR" "$DATA_DIR/templates"
+for SITE in simple append; do
+    DEST="$SITE_DIR/$SITE"
+    mkdir -p "$DEST"
+    if [ ! -d "$DEST/src" ] && [ ! -d "$DEST/content" ]; then
+        cp -R "$SEED_DIR/$SITE/." "$DEST/"
+    fi
+done
 if [ ! -f "$DATA_DIR/config.json" ]; then
     cp "$SEED_DIR/config.json" "$DATA_DIR/"
 fi

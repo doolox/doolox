@@ -30,6 +30,7 @@ func init() {
 func routes(m *macaron.Macaron) {
 	m.Get("/generate", generateView)
 	m.Get("/publish", publishView)
+	m.Get("/dashboard", dashboardView)
 	m.Get("/doolox.js", dooloxJSView)
 	m.Get("/", homeView)
 	m.Get("/assets/*", assetsView)

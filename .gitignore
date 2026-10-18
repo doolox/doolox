@@ -4,5 +4,6 @@
 /dist/
 /installer/
 *.deb
+*.dmg
 admin-lte-v4.10.1.zip
 /adminlte/

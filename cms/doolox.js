@@ -6,7 +6,8 @@
 //   - Ctrl+G (Cmd+G on macOS) — generates the static site via /generate.
 //   - Ctrl+P (Cmd+P on macOS) — generates the site, then commits and pushes
 //     it with git via /publish.
-//   - Ctrl+D (Cmd+D on macOS) — opens the Doolox Dashboard.
+//   - Ctrl+D (Cmd+D on macOS) — opens the Doolox Dashboard (native web view on
+//     Windows/macOS, system browser on Linux).
 //
 // The server shows a native system notification with the generate and publish
 // results.
@@ -38,7 +39,7 @@
     }
 
     function dashboard() {
-        window.open("http://localhost:5555", "_blank");
+        request("/dashboard", "open dashboard");
     }
 
     document.addEventListener("keydown", function (event) {

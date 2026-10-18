@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+{{template "header" .}}
+<body class="min-vh-100 d-flex flex-column">
+  {{template "main_menu" .}}
+  <main class="flex-grow-1">
+    <section class="bg-body-tertiary border-bottom py-5">
+      <div class="container">
+        <p class="text-primary fw-semibold text-uppercase mb-2">Simple</p>
+        <h1 class="display-5 fw-bold">{{ .Page.Title }}</h1>
+        <p class="lead text-body-secondary mb-0">{{ .Page.Subtitle }}</p>
+      </div>
+    </section>
+    {{ yield }}
+  </main>
+  {{template "footer" .}}
+</body>
+</html>

@@ -1,0 +1,19 @@
+{{define "main_menu"}}
+<header class="border-bottom bg-light">
+  <nav class="navbar navbar-expand-lg navbar-light container py-3" aria-label="Main navigation">
+    <a class="navbar-brand d-flex align-items-center" href="/" style="font-size: 1.875rem;">
+      <img class="me-2" src="/assets/img/favicon.svg" width="48" height="48" alt="">
+      Simple
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#simpleNavigation" aria-controls="simpleNavigation" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-end" id="simpleNavigation">
+      <ul class="navbar-nav">
+        <li class="nav-item"><a class="nav-link{{if .Page.IsActive "/"}} active{{end}}" href="/">Home</a></li>
+        <li class="nav-item"><a class="nav-link{{if .Page.IsActive "/about"}} active{{end}}" href="/about">About</a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+{{end}}
