@@ -86,4 +86,10 @@ func TestDooloxJSServedAndInjected(t *testing.T) {
 	if !strings.Contains(body, "/publish") {
 		t.Error("/doolox.js body missing /publish endpoint")
 	}
+	if !strings.Contains(body, "Ctrl+D") {
+		t.Error("/doolox.js body missing Ctrl+D handling")
+	}
+	if !strings.Contains(body, "localhost:5555") {
+		t.Error("/doolox.js body missing dashboard URL")
+	}
 }

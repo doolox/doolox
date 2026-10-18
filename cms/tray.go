@@ -68,9 +68,9 @@ func runTray(icon TrayIcon, onShutdown func()) {
 			}
 		})
 
-		mGenerate := systray.AddMenuItem("Generate", "Generate the static site")
-		mPublish := systray.AddMenuItem("Publish", "Generate the static site and push it with git")
-		mDashboard := systray.AddMenuItem("Doolox Dashboard", "Open the Doolox admin interface")
+		mGenerate := systray.AddMenuItem("Generate (ctrl+g)", "Generate the static site")
+		mPublish := systray.AddMenuItem("Publish (ctrl+p)", "Generate the static site and push it with git")
+		mDashboard := systray.AddMenuItem("Doolox Dashboard (ctrl+d)", "Open the Doolox admin interface")
 
 		go func() {
 			for {

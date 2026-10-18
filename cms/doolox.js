@@ -2,12 +2,14 @@
 //
 // This file is loaded only while Doolox is serving the site for preview
 // (http://localhost:5000); it is never included in the generated static site.
-// It registers two shortcuts:
+// It registers three shortcuts:
 //   - Ctrl+G (Cmd+G on macOS) — generates the static site via /generate.
 //   - Ctrl+P (Cmd+P on macOS) — generates the site, then commits and pushes
 //     it with git via /publish.
+//   - Ctrl+D (Cmd+D on macOS) — opens the Doolox Dashboard.
 //
-// The server shows a native system notification with the result.
+// The server shows a native system notification with the generate and publish
+// results.
 (function () {
     "use strict";
 
@@ -35,6 +37,10 @@
         request("/publish", "publish");
     }
 
+    function dashboard() {
+        window.open("http://localhost:5555", "_blank");
+    }
+
     document.addEventListener("keydown", function (event) {
         if (!(event.ctrlKey || event.metaKey) || event.altKey) {
             return;
@@ -47,6 +53,9 @@
         } else if (key === "p") {
             event.preventDefault();
             publish();
+        } else if (key === "d") {
+            event.preventDefault();
+            dashboard();
         }
     });
 })();

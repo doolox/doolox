@@ -51,9 +51,9 @@ While running, Doolox exposes two local addresses:
 
 A **system tray icon** gives you the same controls without a browser:
 
-- **Generate** — generate the static site.
-- **Publish** — generate the static site and push it with git.
-- **Doolox Dashboard** — open the dashboard.
+- **Generate** — generate the static site (`ctrl+g`).
+- **Publish** — generate the static site and push it with git (`ctrl+p`).
+- **Doolox Dashboard** — open the dashboard (`ctrl+d`).
 - **Quit** — stop Doolox.
 
 Clicking the tray icon opens your live website.
@@ -425,11 +425,23 @@ so the output needs no runtime.
 | `/`                | Home page of the main website.                           |
 | `/generate`        | Generate the static site (returns plain text).           |
 | `/publish`         | Generate, then commit and push the site with git.        |
-| `/doolox.js`       | Live-preview helper (Ctrl+G / Ctrl+P shortcuts).         |
+| `/doolox.js`       | Live-preview helper (Ctrl+G / Ctrl+P / Ctrl+D shortcuts). |
 | `/assets/*`        | Assets of the main website.                              |
 | `/:seg`            | Page of the main website, or home of a nested website.   |
 | `/:seg/:page`      | Page of the website named by the first segment.          |
 | `/:seg/assets/*`   | Assets of the website named by the first segment.        |
+
+### Keyboard shortcuts
+
+While viewing the live site at `http://localhost:5000`:
+
+| Shortcut | Action                                            |
+| -------- | ------------------------------------------------- |
+| `Ctrl+G` | Generate the static site.                         |
+| `Ctrl+P` | Generate, then commit and push the site with git. |
+| `Ctrl+D` | Open the Doolox Dashboard.                        |
+
+On macOS, use `Cmd` instead of `Ctrl`.
 
 ### Environment variables
 
