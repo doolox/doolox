@@ -459,6 +459,7 @@ make vet        # run go vet
 make fmt        # format all Go sources
 make tidy       # tidy module dependencies
 make build-deb  # build a .deb package for Debian/Ubuntu/Linux Mint
+make build-dmg  # build a macOS .dmg disk image (on macOS)
 make clean      # remove bin/
 make help       # list all targets
 ```

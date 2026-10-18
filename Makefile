@@ -17,7 +17,7 @@ LDFLAGS := -s -w
 GOFLAGS := -trimpath
 
 .PHONY: all build run test vet fmt tidy clean install \
-        build-darwin build-deb help
+        build-darwin build-deb build-dmg help
 
 all: build ## Build the binary (default target)
 
@@ -53,6 +53,10 @@ build-darwin: ## Build for macOS (must be run on macOS)
 
 build-deb: ## Build a .deb package for Debian/Ubuntu/Linux Mint
 	./build-deb.sh
+
+build-dmg: ## Build a macOS .dmg disk image (must be run on macOS)
+	@test "$$(go env GOOS)" = "darwin" || { echo "error: build-dmg requires macOS"; exit 1; }
+	./build-dmg.sh
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-16s %s\n", $$1, $$2}'

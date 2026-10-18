@@ -69,6 +69,36 @@ make build-darwin   # -> bin/doolox-darwin
 ./bin/doolox
 ```
 
+### macOS disk image (.dmg)
+
+Build a `Doolox.app` bundle and a `.dmg` disk image:
+
+```sh
+make build          # -> bin/doolox (native architecture)
+./build-dmg.sh      # -> dist/Doolox-<version>.dmg
+```
+
+The `.dmg` contains `Doolox.app` — a menu-bar-only app (it hides the Dock
+icon, since Doolox lives in the system tray) — and a link to `/Applications`.
+Drag the app into `Applications` to install it.
+
+Because the app is unsigned, macOS Gatekeeper blocks it on first launch:
+right-click the app in Finder and choose **Open**, or clear the quarantine
+flag with:
+
+```sh
+xattr -dr com.apple.quarantine /Applications/Doolox.app
+```
+
+A signed/notarized build requires an Apple Developer certificate and running
+`codesign` + `xcrun notarytool`; that is not automated yet.
+
+### GitHub Actions
+
+The `release` workflow builds the `.dmg` on a `macos-latest` (Apple Silicon)
+runner. It compiles both the arm64 and amd64 slices and merges them into a
+universal binary with `lipo`, then packages the app with `build-dmg.sh`.
+
 ## Windows
 
 Option A — PowerShell (no `make` required):

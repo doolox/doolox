@@ -1,11 +1,12 @@
-# Builds the Debian package (.deb) and the Windows installer (.exe), then
-# publishes them as a GitHub Release whenever a change is pushed to the
-# `release` branch.
+# Builds the Debian package (.deb), the Windows installer (.exe), and the macOS
+# disk image (.dmg), then publishes them as a GitHub Release whenever a change
+# is pushed to the `release` branch.
 #
 # The release tag/name come from the version in `version.iss` (single source
 # of truth), e.g. version "1.0.0" -> tag "v1.0.0" and assets:
 #   dist/doolox_1.0.0_amd64.deb
 #   dist/doolox-setup-1.0.0.exe
+#   dist/Doolox-1.0.0.dmg
 name: Release
 
 on:
@@ -83,11 +84,47 @@ jobs:
           if-no-files-found: error
 
   # ---------------------------------------------------------------------------
-  # Publish a GitHub Release with both artifacts.
+  # macOS disk image (.dmg)
+  # ---------------------------------------------------------------------------
+  build-macos:
+    name: Build .dmg
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Build universal binary (arm64 + amd64)
+        run: |
+          mkdir -p bin
+          # Native arm64 build (the macOS runner is Apple Silicon).
+          CGO_ENABLED=1 GOOS=darwin GOARCH=arm64 go build -trimpath -ldflags "-s -w" -o bin/doolox-arm64 .
+          # Cross-compile the amd64 slice; Xcode's SDK is universal, so cgo
+          # (the Objective-C tray icon) builds for both architectures.
+          CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build -trimpath -ldflags "-s -w" -o bin/doolox-amd64 .
+          lipo -create bin/doolox-arm64 bin/doolox-amd64 -output bin/doolox
+
+      - name: Package .app and .dmg
+        run: ./build-dmg.sh
+
+      - name: Upload .dmg artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dmg
+          path: dist/*.dmg
+          if-no-files-found: error
+
+  # ---------------------------------------------------------------------------
+  # Publish a GitHub Release with all artifacts.
   # ---------------------------------------------------------------------------
   release:
     name: Publish GitHub Release
-    needs: [build-deb, build-exe]
+    needs: [build-deb, build-exe, build-macos]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -122,6 +159,7 @@ jobs:
           gh release create "$TAG" \
             artifacts/deb/*.deb \
             artifacts/exe/*.exe \
+            artifacts/dmg/*.dmg \
             --title "Doolox ${VERSION}" \
             --target "$GITHUB_SHA" \
             --generate-notes
