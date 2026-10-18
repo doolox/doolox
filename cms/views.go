@@ -135,3 +135,13 @@ func publishView(ctx *macaron.Context) {
 		http.StatusOK,
 		[]byte(msg+"\n"))
 }
+
+// dashboardView opens the Doolox Dashboard the same way the tray menu's
+// "Doolox Dashboard" action does: a native web view on Windows and macOS, the
+// system browser on Linux. It is the endpoint behind the Ctrl+D preview
+// shortcut. launchDashboard blocks on the web view platforms, so run it in its
+// own goroutine.
+func dashboardView(ctx *macaron.Context) {
+	go launchDashboard()
+	ctx.Render.PlainText(http.StatusOK, []byte("opening dashboard\n"))
+}

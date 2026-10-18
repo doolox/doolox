@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html lang="en">
+{{template "header" .}}
+<body class="min-vh-100 d-flex flex-column">
+  {{template "main_menu" .}}
+  <main class="flex-grow-1">{{ yield }}</main>
+  {{template "footer" .}}
+</body>
+</html>
