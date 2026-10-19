@@ -84,7 +84,7 @@ func TestNewPage(t *testing.T) {
 func TestGenerateWritesToWebsiteRoot(t *testing.T) {
 	t.Setenv(dooloxHomeEnv, t.TempDir())
 	previousConf := conf
-	conf = &Config{Website: "simple", URL: "https://example.com"}
+	conf = &Config{Website: "simple"}
 	defer func() { conf = previousConf }()
 
 	site := "simple"
@@ -110,7 +110,7 @@ func TestGenerateWritesToWebsiteRoot(t *testing.T) {
 		t.Fatal(err)
 	}
 	for name, body := range map[string]string{
-		"config.json": "{\"name\":\"simple\"}",
+		"config.json": "{\"url\":\"https://example.com\"}",
 		"README.md":   "site notes",
 		"CNAME":       "example.com",
 		"stale.html":  "old output",

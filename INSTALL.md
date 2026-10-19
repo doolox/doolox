@@ -39,8 +39,8 @@ sudo apt install ./dist/doolox_*.deb
 This installs the binary to `/opt/doolox`, a launcher to `/usr/bin/doolox`,
 a menu entry and icons, plus the bundled templates and config. On first launch
 a `doolox` folder is created in your home directory, containing `config.json`,
-plus a `websites/` subfolder with the bundled sites: the main `append/src/`
-site (served at `/`) and a nested `append/cms/src/` site (served at `/cms`).
+plus a `websites/` subfolder with the bundled sites: `simple/` (the default,
+served at `/`) and `append/`.
 Each website's generated HTML pages and assets are written inside its own
 folder, and a single combined `sitemap.xml` is written into the main
 website's folder. An empty `templates/` folder is also created. Logs are
@@ -160,9 +160,10 @@ make help       # list all targets
 
   The page URL is the file name without the extension (`about.html` ->
   `/about`); `index.html` is the home page.
-- The main website is set in `config.json` (`"website"`, default `append`) and
-  is served at the site root; any other website is a subfolder of it
-  (e.g. `cms/`) and is served at `/<subfolder>/`.
+- The main website is set in `config.json` (`"website"`, default `simple`) and
+  is served at the site root; any other website is a subfolder of it and is
+  served at `/<subfolder>/`. Each website's `url` and `theme` live in that
+  website's own `config.json`.
 - The tray icon assets (`assets/trayicon.svg`, `assets/trayicon.png`,
   `assets/trayicon.ico`) are embedded into the binary at build time with
   `go:embed`, so no extra runtime files are needed.

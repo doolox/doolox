@@ -46,6 +46,7 @@ mkdir -p "$RESOURCES/seed"
 cp -R "$ROOT/defaults/simple/." "$RESOURCES/seed/simple/"
 cp -R "$ROOT/defaults/append/." "$RESOURCES/seed/append/"
 cp "$ROOT/defaults/config.json" "$RESOURCES/seed/config.json"
+cp "$ROOT/defaults/config-website.json" "$RESOURCES/seed/config-website.json"
 
 # Launcher wrapper (CFBundleExecutable) that seeds the bundled defaults on
 # first run, then execs the real binary. It mirrors the Linux launcher.
@@ -60,6 +61,9 @@ for SITE in simple append; do
     mkdir -p "$DEST"
     if [ ! -d "$DEST/src" ] && [ ! -d "$DEST/content" ]; then
         cp -R "$DIR/../Resources/seed/$SITE/." "$DEST/"
+    fi
+    if [ ! -f "$DEST/config.json" ]; then
+        cp "$DIR/../Resources/seed/config-website.json" "$DEST/config.json"
     fi
 done
 if [ ! -f "$DATA_DIR/config.json" ]; then

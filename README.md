@@ -86,11 +86,12 @@ works entirely out of it:
 
 ```
 ~/doolox/
-├── config.json          # your configuration
+├── config.json          # names the current website ("website" only)
 ├── doolox.log           # log output
 ├── templates/           # reserved (currently unused)
 └── websites/            # one subfolder per website
-    └── append/          # the default website ("append")
+    └── simple/          # the default website ("simple")
+        ├── config.json  # this website's settings (url + theme)
         ├── src/         # the website source (your content)
         │   ├── pages/           # one .html file per page
         │   ├── layout.html      # layout for inner pages
@@ -107,21 +108,34 @@ variable (mainly useful for testing).
 
 ## Configuration
 
-Everything is configured in `~/doolox/config.json`:
+Configuration is split across two files.
+
+**Root config** — `~/doolox/config.json` — names the current website:
 
 ```json
 {
-    "theme": "simple",
-    "url": "https://example.com",
-    "website": "append"
+    "website": "simple"
 }
 ```
 
 | Key       | Purpose                                                                                                    |
 | --------- | ---------------------------------------------------------------------------------------------------------- |
-| `website` | Name of the **main** website (its folder under `websites/`). Served at the site root `/`. Defaults to `append`. |
-| `url`     | The public URL of your site. Used to build `sitemap.xml`. Required for generation to write the sitemap.    |
-| `theme`   | Reserved for future use — it is loaded but not currently used by the renderer.                             |
+| `website` | Name of the **main** website (its folder under `websites/`). Served at the site root `/`. Defaults to `simple`. |
+
+**Website config** — `~/doolox/websites/<website>/config.json` — holds that
+website's own settings:
+
+```json
+{
+    "theme": "simple",
+    "url": "https://example.com"
+}
+```
+
+| Key     | Purpose                                                                         |
+| ------- | ------------------------------------------------------------------------------- |
+| `url`   | The public URL of the site. Used to build `sitemap.xml` (required to write it). |
+| `theme` | Reserved for future use — it is loaded but not currently used by the renderer.  |
 
 ---
 

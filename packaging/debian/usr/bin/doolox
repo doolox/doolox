@@ -22,6 +22,9 @@ for SITE in simple append; do
     if [ ! -d "$DEST/src" ] && [ ! -d "$DEST/content" ]; then
         cp -R "$SEED_DIR/$SITE/." "$DEST/"
     fi
+    if [ ! -f "$DEST/config.json" ]; then
+        cp "$SEED_DIR/config-website.json" "$DEST/config.json"
+    fi
 done
 if [ ! -f "$DATA_DIR/config.json" ]; then
     cp "$SEED_DIR/config.json" "$DATA_DIR/"

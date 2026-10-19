@@ -43,6 +43,7 @@ mkdir -p "$STAGE/opt/doolox/seed/simple" "$STAGE/opt/doolox/seed/append"
 cp -R "$ROOT/defaults/simple/." "$STAGE/opt/doolox/seed/simple/"
 cp -R "$ROOT/defaults/append/." "$STAGE/opt/doolox/seed/append/"
 cp "$ROOT/defaults/config.json" "$STAGE/opt/doolox/seed/config.json"
+cp "$ROOT/defaults/config-website.json" "$STAGE/opt/doolox/seed/config-website.json"
 
 # 5. Icons -> hicolor theme + pixmaps fallback (the .desktop uses Icon=doolox).
 #    Render PNGs at multiple sizes from the SVG (reusing the project's Go

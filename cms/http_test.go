@@ -127,7 +127,7 @@ func TestHTTPRoutes(t *testing.T) {
 	prevConf := conf
 	prevM := m
 	prevOpts := renderOpts
-	conf = &Config{Website: "doolox", URL: "https://example.com"}
+	conf = &Config{Website: "doolox"}
 	defer func() {
 		conf = prevConf
 		m = prevM
@@ -188,7 +188,7 @@ func TestHTTPRouteLegacyHome(t *testing.T) {
 	prevConf := conf
 	prevM := m
 	prevOpts := renderOpts
-	conf = &Config{Website: "doolox", URL: "https://example.com"}
+	conf = &Config{Website: "doolox"}
 	defer func() {
 		conf = prevConf
 		m = prevM
@@ -229,7 +229,7 @@ func TestMultipleWebsitesRoutingAndCombinedSitemap(t *testing.T) {
 
 	prevConf := conf
 	prevM := m
-	conf = &Config{Website: "simple", URL: "https://example.com"}
+	conf = &Config{Website: "simple"}
 	defer func() {
 		conf = prevConf
 		m = prevM
@@ -252,6 +252,14 @@ func TestMultipleWebsitesRoutingAndCombinedSitemap(t *testing.T) {
 	mkSite(filepath.Join(dir, "websites", "simple"), "simple", "SIMPLE HOME")
 	// Nested website, a subfolder of the default website.
 	mkSite(filepath.Join(dir, "websites", "simple", "append"), "append", "APPEND HOME")
+
+	// Per-website configs (the url is used by the sitemap).
+	if err := os.WriteFile(filepath.Join(dir, "websites", "simple", "config.json"), []byte(`{"url":"https://example.com"}`), 0644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, "websites", "simple", "append", "config.json"), []byte(`{"url":"https://example.com/append"}`), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	m = initMacaron()
 	routes(m)

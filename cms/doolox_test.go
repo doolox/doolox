@@ -29,7 +29,7 @@ func TestDooloxJSServedAndInjected(t *testing.T) {
 	prevConf := conf
 	prevM := m
 	prevOpts := renderOpts
-	conf = &Config{Website: "doolox", URL: "https://example.com"}
+	conf = &Config{Website: "doolox"}
 	defer func() {
 		conf = prevConf
 		m = prevM

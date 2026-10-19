@@ -230,16 +230,10 @@ type sitemapURL struct {
 }
 
 // generateSitemap writes a single combined sitemap.xml inside the main
-// website's folder, listing every page of every website under its own path.
-// It is written after each website's output has been cleared, so it always
-// reflects the pages that were just generated.
+// website's folder. Each website's pages use that website's own `url` from
+// its per-site config.json. It is written after each website's output has
+// been cleared, so it always reflects the pages that were just generated.
 func generateSitemap(sitePages []sitePage) error {
-	site := strings.TrimSuffix(conf.URL, "/")
-
-	if site == "" {
-		return fmt.Errorf("no url set in the configuration")
-	}
-
 	sm := sitemap{
 		XMLNS: "http://www.sitemaps.org/schemas/sitemap/0.9",
 		XHTML: "http://www.w3.org/1999/xhtml",
@@ -251,14 +245,12 @@ func generateSitemap(sitePages []sitePage) error {
 			priority = "1.0000"
 		}
 
-		// The default website is served at the root of the URL; every other
-		// website is served under its own subpath.
-		var loc string
-		if sp.site == Website() {
-			loc = site + "/"
-		} else {
-			loc = site + "/" + sp.site + "/"
+		url := strings.TrimSuffix(siteConfig(sp.site).URL, "/")
+		if url == "" {
+			return fmt.Errorf("no url set for website %q", sp.site)
 		}
+
+		loc := url + "/"
 		if sp.page.URL != indexPage {
 			loc += sp.page.URL
 		}

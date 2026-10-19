@@ -94,6 +94,8 @@ Source: "admin\theme\*"; DestDir: "{app}\admin\theme"; Flags: ignoreversion recu
 ; ---------------------------------------------------------------------------
 Source: "defaults\simple\*"; DestDir: "{%USERPROFILE}\doolox\websites\simple"; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist uninsneveruninstall; Check: ShouldSeedSiteSource('simple')
 Source: "defaults\append\*"; DestDir: "{%USERPROFILE}\doolox\websites\append"; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist uninsneveruninstall; Check: ShouldSeedSiteSource('append')
+Source: "defaults\config-website.json"; DestDir: "{%USERPROFILE}\doolox\websites\simple"; DestName: "config.json"; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall
+Source: "defaults\config-website.json"; DestDir: "{%USERPROFILE}\doolox\websites\append"; DestName: "config.json"; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall
 Source: "defaults\config.json"; DestDir: "{%USERPROFILE}\doolox"; Flags: ignoreversion onlyifdoesntexist uninsneveruninstall
 
 [Dirs]
