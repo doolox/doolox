@@ -42,11 +42,17 @@ func publish() (string, error) {
 	return fmt.Sprintf("Site published: %d pages generated, committed and pushed", generated), nil
 }
 
-// gitCommitAndPush runs `git commit -a -m <message>` and then `git push` in
-// the given directory. A "nothing to commit" result is not treated as an
-// error: the tree is already up to date, so the push still runs.
+// gitCommitAndPush stages all changes (including new untracked files and
+// deletions) with `git add -A`, commits them with `git commit -m <message>`,
+// and then runs `git push` in the given directory. A "nothing to commit"
+// result is not treated as an error: the tree is already up to date, so the
+// push still runs.
 func gitCommitAndPush(dir string) error {
-	if out, err := runGit(dir, "commit", "-a", "-m", publishCommitMessage); err != nil {
+	if out, err := runGit(dir, "add", "-A"); err != nil {
+		return fmt.Errorf("git add: %v: %s", err, strings.TrimSpace(out))
+	}
+
+	if out, err := runGit(dir, "commit", "-m", publishCommitMessage); err != nil {
 		if !strings.Contains(strings.ToLower(out), "nothing to commit") {
 			return fmt.Errorf("git commit: %v: %s", err, strings.TrimSpace(out))
 		}

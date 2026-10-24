@@ -54,6 +54,20 @@ func TestGitCommitAndPush(t *testing.T) {
 		t.Errorf("remote HEAD subject = %q, want %q", strings.TrimSpace(got), publishCommitMessage)
 	}
 
+	// Add a brand-new untracked file, then commit and push it. This is the
+	// case that `git commit -a` alone would miss.
+	if err := os.WriteFile(filepath.Join(work, "newpage.html"), []byte("new"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	if err := gitCommitAndPush(work); err != nil {
+		t.Fatalf("gitCommitAndPush() with new file error = %v", err)
+	}
+
+	// The new file must now exist in the remote's HEAD.
+	if got := runGitTest(t, remote, "show", "HEAD:newpage.html"); strings.TrimSpace(got) != "new" {
+		t.Errorf("remote newpage.html content = %q, want %q", strings.TrimSpace(got), "new")
+	}
+
 	// With no changes, "nothing to commit" must not be treated as an error.
 	if err := gitCommitAndPush(work); err != nil {
 		t.Errorf("gitCommitAndPush() with clean tree error = %v, want nil", err)
